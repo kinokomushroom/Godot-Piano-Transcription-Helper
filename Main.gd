@@ -17,6 +17,7 @@ var delta: float = 1.0 / 60.0
 var spectrum: AudioEffectSpectrumAnalyzerInstance = AudioServer.get_bus_effect_instance(0, 0)
 var stream_length: float = 0.0
 
+var file_chosen: bool = false
 var play_position: float = 0.0
 var playing: bool = false
 var scrubbing: bool = false
@@ -64,7 +65,13 @@ func _draw():
 		draw_magnitude(key_index)
 		draw_key(key_index)
 
-func audio_updated():
+func initialize_values():
+	$Control/startstop.disabled = false
+	$Control/reset.disabled = false
+	$Control/minus1.disabled = false
+	$Control/plus1.disabled = false
+	$Control/minus5.disabled = false
+	$Control/plus5.disabled = false
 	$AudioStreamPlayer.stop()
 	playing = false
 	play_position = 0.0
@@ -82,27 +89,28 @@ func _ready():
 	viewport_size_changed()
 	for key_index in range(0, key_number):
 		magnitude_db_array.append(lowest_magnitude)
-	audio_updated()
+
 
 func _process(_delta):
 	delta = _delta
-	var stream_playing: bool = $AudioStreamPlayer.playing
-	if playing and not scrubbing:
-		var reached_end: bool = play_position >= stream_length - 0.1
-		if not stream_playing and not reached_end:
-			$AudioStreamPlayer.play(play_position)
-		if reached_end:
-			$AudioStreamPlayer.stop()
-		play_position = $AudioStreamPlayer.get_playback_position()
-		$Control/TimeBar.value = play_position
-	elif playing and scrubbing:
-		if stream_playing:
-			$AudioStreamPlayer.stop()
-		play_position = $Control/TimeBar.value
-		scrubbing = false
-	elif not playing and scrubbing:
-		play_position = $Control/TimeBar.value
-		scrubbing = false
+	if file_chosen:
+		var stream_playing: bool = $AudioStreamPlayer.playing
+		if playing and not scrubbing:
+			var reached_end: bool = play_position >= stream_length - 0.1
+			if not stream_playing and not reached_end:
+				$AudioStreamPlayer.play(play_position)
+			if reached_end:
+				$AudioStreamPlayer.stop()
+			play_position = $AudioStreamPlayer.get_playback_position()
+			$Control/TimeBar.value = play_position
+		elif playing and scrubbing:
+			if stream_playing:
+				$AudioStreamPlayer.stop()
+			play_position = $Control/TimeBar.value
+			scrubbing = false
+		elif not playing and scrubbing:
+			play_position = $Control/TimeBar.value
+			scrubbing = false
 	var minutes: int = floor(play_position / 60)
 	var seconds: int = int(play_position) % 60
 	$Control/Timestamp.text = "%d:%02d" % [minutes, seconds]
@@ -162,7 +170,8 @@ func _on_FileDialog_file_selected(path):
 	stream.data = file.get_buffer(file.get_len())
 	$AudioStreamPlayer.stream = stream
 	file.close()
-	audio_updated()
+	file_chosen = true
+	initialize_values()
 
 func _on_Color1_color_changed(color):
 	gradient.set_color(0, color)
