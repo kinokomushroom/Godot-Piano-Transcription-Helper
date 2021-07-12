@@ -8,6 +8,8 @@ colors = PoolColorArray( 1, 0, 1, 1, 0, 1, 1, 1 )
 [node name="Main" type="Node2D"]
 script = ExtResource( 1 )
 gradient = SubResource( 1 )
+white_key_color = Color( 0.141176, 0.141176, 0.141176, 1 )
+black_key_color = Color( 0.0470588, 0.0470588, 0.0470588, 1 )
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
 
@@ -136,6 +138,18 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
+[node name="smooth" type="Button" parent="Control"]
+margin_left = 880.0
+margin_top = 80.0
+margin_right = 1008.0
+margin_bottom = 100.0
+toggle_mode = true
+pressed = true
+text = "smoothing on"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
 [node name="FileDialog" type="FileDialog" parent="Control"]
 margin_right = 560.0
 margin_bottom = 312.0
@@ -171,4 +185,5 @@ __meta__ = {
 [connection signal="color_changed" from="Control/Color1" to="." method="_on_Color1_color_changed"]
 [connection signal="color_changed" from="Control/Color2" to="." method="_on_Color2_color_changed"]
 [connection signal="pressed" from="Control/open" to="." method="_on_open_pressed"]
+[connection signal="toggled" from="Control/smooth" to="." method="_on_smooth_toggled"]
 [connection signal="file_selected" from="Control/FileDialog" to="." method="_on_FileDialog_file_selected"]

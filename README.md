@@ -10,5 +10,6 @@ Created on Godot 3.3.2.
 - Make keys light up
 - Add mode that make frequency peaks easier to see
 - Give user control to displayed dB range
-- Add temporal smoothing
+- ~~Add temporal smoothing~~ done!
 - Make bars freeze in position when playback is paused
+- Add option to hide UI and piano keys
