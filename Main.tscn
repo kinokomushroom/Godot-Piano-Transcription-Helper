@@ -8,8 +8,7 @@ colors = PoolColorArray( 1, 0, 1, 1, 0, 1, 1, 1 )
 [node name="Main" type="Node2D"]
 script = ExtResource( 1 )
 gradient = SubResource( 1 )
-white_key_color = Color( 0.141176, 0.141176, 0.141176, 1 )
-black_key_color = Color( 0.0470588, 0.0470588, 0.0470588, 1 )
+white_key_color = Color( 0.235294, 0.235294, 0.235294, 1 )
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
 
@@ -150,6 +149,17 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
+[node name="filter" type="Button" parent="Control"]
+margin_left = 880.0
+margin_top = 112.0
+margin_right = 1008.0
+margin_bottom = 132.0
+toggle_mode = true
+text = "filtering off"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
 [node name="FileDialog" type="FileDialog" parent="Control"]
 margin_right = 560.0
 margin_bottom = 312.0
@@ -175,6 +185,29 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
+[node name="min_dB" type="SpinBox" parent="Control"]
+margin_left = 936.0
+margin_top = 144.0
+margin_right = 1010.0
+margin_bottom = 168.0
+min_value = -80.0
+max_value = -20.0
+value = -60.0
+suffix = "dB"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="min_dB_label" type="Label" parent="Control"]
+margin_left = 888.0
+margin_top = 149.0
+margin_right = 934.0
+margin_bottom = 163.0
+text = "clamp"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
 [connection signal="toggled" from="Control/startstop" to="." method="_on_startstop_toggled"]
 [connection signal="pressed" from="Control/reset" to="." method="_on_reset_pressed"]
 [connection signal="pressed" from="Control/minus1" to="." method="_on_minus1_pressed"]
@@ -186,4 +219,6 @@ __meta__ = {
 [connection signal="color_changed" from="Control/Color2" to="." method="_on_Color2_color_changed"]
 [connection signal="pressed" from="Control/open" to="." method="_on_open_pressed"]
 [connection signal="toggled" from="Control/smooth" to="." method="_on_smooth_toggled"]
+[connection signal="toggled" from="Control/filter" to="." method="_on_filter_toggled"]
 [connection signal="file_selected" from="Control/FileDialog" to="." method="_on_FileDialog_file_selected"]
+[connection signal="value_changed" from="Control/min_dB" to="." method="_on_min_dB_value_changed"]
