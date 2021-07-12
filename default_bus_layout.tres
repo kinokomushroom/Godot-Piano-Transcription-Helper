@@ -1,0 +1,11 @@
+[gd_resource type="AudioBusLayout" load_steps=2 format=2]
+
+[sub_resource type="AudioEffectSpectrumAnalyzer" id=1]
+resource_name = "SpectrumAnalyzer"
+buffer_length = 4.0
+fft_size = 4
+
+[resource]
+bus/0/volume_db = -0.130497
+bus/0/effect/0/effect = SubResource( 1 )
+bus/0/effect/0/enabled = true
