@@ -14,6 +14,7 @@ var filter_max_difference: float = 0.1
 var filter_appear_speed: float = 0.1
 var filter_disappear_speed: float = 0.2
 var lowest_magnitude: float = -60.0
+var absolute_lowest_magnitude: float = -80.0
 var magnitude_decrease_speed: float = 1.5 * lowest_magnitude
 
 var magnitude_bar_width: float = 0.4
@@ -40,8 +41,14 @@ var stream_length: float = 0.0
 
 var file_chosen: bool = false
 var play_position: float = 0.0
-var playing: bool = false
+var end_cut: float = 0.05
+var playing_mode: bool = false
 var scrubbing: bool = false
+var loop: bool = false
+var reached_end: bool = false
+
+enum HideState {NONE, UI, BOTH}
+var hide_state = HideState.NONE
 
 func map_range(value, source_start, source_end, target_start, target_end):
 	var mapped_value: float = value - source_start
@@ -60,18 +67,17 @@ func initialize_values():
 	$Control/minus5.disabled = false
 	$Control/plus5.disabled = false
 	$AudioStreamPlayer.stop()
-	playing = false
+	playing_mode = false
 	play_position = 0.0
 	stream_length = $AudioStreamPlayer.stream.get_length()
-	$Control/TimeBar.max_value = stream_length
+	$Control/TimeBar.max_value = stream_length - end_cut
 	$Control/TimeBar.value = play_position
 	$Control/startstop.pressed = false
 
-func change_time(difference):
-	play_position = clamp(play_position + difference, 0.0, stream_length)
+func change_time(time):
+	play_position = clamp(time, 0.0, stream_length - end_cut)
 	$Control/TimeBar.value = play_position
-	if playing:
-		$AudioStreamPlayer.play(play_position)
+	$AudioStreamPlayer.seek(play_position)
 
 func import_mp3(path: String):
 	var file = File.new()
@@ -88,7 +94,38 @@ func import_ogg(path: String):
 	file.close()
 	return stream
 
+func control_playback():
+	if file_chosen:
+		reached_end = play_position >= stream_length - end_cut
+		var stream_playing: bool = $AudioStreamPlayer.playing
+		if not scrubbing:
+			if playing_mode:
+				if not stream_playing:
+					if not reached_end:
+						$AudioStreamPlayer.play(play_position)
+					elif reached_end and loop:
+						$AudioStreamPlayer.play(0.0)
+				elif stream_playing and reached_end:
+					if loop:
+						$AudioStreamPlayer.play(0.0)
+					else:
+						$AudioStreamPlayer.stop()
+			elif not playing_mode and stream_playing:
+				$AudioStreamPlayer.stop()
+			play_position = $AudioStreamPlayer.get_playback_position()
+			$Control/TimeBar.value = play_position
+		elif scrubbing:
+			if playing_mode and stream_playing:
+				$AudioStreamPlayer.stop()
+			play_position = $Control/TimeBar.value
+			$AudioStreamPlayer.seek(play_position)
+			scrubbing = false
+
 func analyze_frequencies():
+	if not $AudioStreamPlayer.playing:
+		# stop processing when paused, so that it appears frozen
+		return
+	
 	for key_index in range(0, key_number):
 		var frequency_start: float = lowest_frequency * pow(2.0, (1.0 / 12.0) * (key_index - 0.5))
 		var frequency_end: float = lowest_frequency * pow(2.0, (1.0 / 12.0) * (key_index + 0.5))
@@ -102,7 +139,7 @@ func analyze_frequencies():
 		
 		# fix infinity errors when magnitude is 0
 		if magnitude_db == -INF:
-			magnitude_db = lowest_magnitude
+			magnitude_db = absolute_lowest_magnitude
 		
 		# average values over several frames
 		var sum: float = magnitude_db
@@ -121,23 +158,18 @@ func analyze_frequencies():
 		
 		# gradually decrease value to make it less jumpy
 		magnitude_db = max(magnitude_db_array[key_index][averaging_frames - 2] + magnitude_decrease_speed * delta, magnitude_db)
-		magnitude_db = max(lowest_magnitude, magnitude_db)
+		magnitude_db = max(absolute_lowest_magnitude, magnitude_db)
 		magnitude_db_array[key_index][averaging_frames - 1] = magnitude_db
 	
+	# analyze peak frequencies
 	for key_index in range(1, key_number - 1):
 		var center_value: float = magnitude_db_array[key_index][averaging_frames - 1]
 		var left_value: float = magnitude_db_array[key_index - 1][averaging_frames - 1]
 		var right_value: float = magnitude_db_array[key_index + 1][averaging_frames - 1]
 		if center_value >= left_value - filter_max_difference and center_value >= right_value - filter_max_difference:
-			if smooth:
-				filtered_magnitude_array[key_index] = min(1.0, filtered_magnitude_array[key_index] + 1.0 / filter_appear_speed * delta)
-			else:
-				filtered_magnitude_array[key_index] = 1.0
+			filtered_magnitude_array[key_index] = min(1.0, filtered_magnitude_array[key_index] + 1.0 / filter_appear_speed * delta)
 		else:
-			if smooth:
-				filtered_magnitude_array[key_index] = max(0.0, filtered_magnitude_array[key_index] - 1.0 / filter_disappear_speed * delta)
-			else:
-				filtered_magnitude_array[key_index] = 0.0
+			filtered_magnitude_array[key_index] = max(0.0, filtered_magnitude_array[key_index] - 1.0 / filter_disappear_speed * delta)
 
 func draw_magnitude():
 	for key_index in range(0, key_number):
@@ -148,12 +180,14 @@ func draw_magnitude():
 		var height: float = screen_size.y * height_uniform
 		var width: float = screen_size.x / float(key_number) * magnitude_bar_width
 		var color: Color = gradient.interpolate(x_position_uniform)
+		var alpha: float = 1.0
 		if height_uniform < 0.5:
-			color = color.darkened(map_range(height_uniform, 0.0, 0.5, 0.9, 0.0))
+			alpha *= map_range(height_uniform, 0.0, 0.5, 0.1, 1.0)
 		else:
 			color = color.lightened(map_range(height_uniform, 0.5, 1.0, 0.0, 1.0))
 		if filter:
-			color = color.darkened(1.0 - map_range(filtered_magnitude_array[key_index], 0.0, 1.0, 0.2, 1.0))
+			alpha *= map_range(filtered_magnitude_array[key_index], 0.0, 1.0, 0.2, 1.0)
+		color.a = alpha
 		draw_rect(Rect2(x_position - width / 2, (screen_size.y - height) * bar_screen_height, width, height * bar_screen_height), color)
 
 func draw_lines():
@@ -166,6 +200,7 @@ func draw_lines():
 	line_opacity = clamp(line_opacity, 0.0, 1.0)
 	var color: Color = line_color
 	color.a = line_opacity
+	
 	# draw lines from -120dB to 50dB
 	for db in range(-120, 40, 20):
 		var line_height_left = screen_size.y * map_range(db - tilt_amount, lowest_magnitude, 0.0, 1.0, 0.0) * bar_screen_height
@@ -181,17 +216,21 @@ func draw_key():
 		if key_white_array[key_index]:
 			draw_rect(Rect2(x_position - width / 2, screen_size.y - height, width, height), white_key_color)
 		else:
-			draw_rect(Rect2(x_position - width / 2, screen_size.y - height, width, height * 0.8), black_key_color)
+#			draw_rect(Rect2(x_position - width / 2, screen_size.y - height, width, height * 0.8), black_key_color)
+			draw_rect(Rect2(x_position - width / 2, screen_size.y - height, width, height), black_key_color)
 
 func _draw():
 	draw_rect(Rect2(0, 0, screen_size.x, screen_size.y), Color.black)
 	draw_lines()
 	draw_magnitude()
-	draw_key()
+	if hide_state != HideState.BOTH:
+		draw_key()
 
 func viewport_size_changed():
 	screen_size = get_viewport().size
 	$Control.rect_size = screen_size
+	if hide_state != HideState.NONE:
+		$Control.rect_position.x = screen_size.x
 
 func _ready():
 	# make viewport resize detectable
@@ -202,7 +241,7 @@ func _ready():
 	for key_index in range(0, key_number):
 		var values = []
 		for frame in averaging_frames:
-			values.append(lowest_magnitude)
+			values.append(absolute_lowest_magnitude)
 		magnitude_db_array.append(values)
 		
 		filtered_magnitude_array.append(0)
@@ -214,58 +253,41 @@ func _ready():
 
 func _process(_delta):
 	delta = _delta
-	if file_chosen:
-		var stream_playing: bool = $AudioStreamPlayer.playing
-		if playing and not scrubbing:
-			var reached_end: bool = play_position >= stream_length - 0.1
-			if not stream_playing and not reached_end:
-				$AudioStreamPlayer.play(play_position)
-			if reached_end:
-				$AudioStreamPlayer.stop()
-			play_position = $AudioStreamPlayer.get_playback_position()
-			$Control/TimeBar.value = play_position
-		elif playing and scrubbing:
-			if stream_playing:
-				$AudioStreamPlayer.stop()
-			play_position = $Control/TimeBar.value
-			scrubbing = false
-		elif not playing and scrubbing:
-			play_position = $Control/TimeBar.value
-			scrubbing = false
+	
+	control_playback()
+	
+	# display time position
 	var minutes: int = floor(play_position / 60)
 	var seconds: int = int(play_position) % 60
 	$Control/Timestamp.text = "%d:%02d" % [minutes, seconds]
+	
 	analyze_frequencies()
 	update()
 #	print(magnitude_db_array[40])
 
 func _on_startstop_toggled(button_pressed):
 	if button_pressed == true:
-		playing = true
+		playing_mode = true
 		$Control/startstop.text = "pause"
-		$AudioStreamPlayer.play(play_position)
+
 	else:
-		playing = false
+		playing_mode = false
 		$Control/startstop.text = "play"
-		$AudioStreamPlayer.stop()
 
 func _on_minus1_pressed():
-	change_time(-1.0)
+	change_time(play_position - 1.0)
 
 func _on_plus1_pressed():
-	change_time(1.0)
+	change_time(play_position + 1.0)
 
 func _on_minus5_pressed():
-	change_time(-5.0)
+	change_time(play_position - 5.0)
 
 func _on_plus5_pressed():
-	change_time(5.0)
+	change_time(play_position + 5.0)
 
 func _on_reset_pressed():
-	play_position = 0.0
-	$Control/TimeBar.value = play_position
-	if playing:
-		$AudioStreamPlayer.play(play_position)
+	change_time(0.0)
 
 func _on_open_pressed():
 	$Control/FileDialog.popup_centered()
@@ -311,3 +333,31 @@ func _on_filter_toggled(button_pressed):
 func _on_tilt_value_changed(value):
 	tilt_amount = value
 	line_display_timer = line_display_duration
+
+func _on_loop_toggled(button_pressed):
+	if button_pressed:
+		loop = true
+		$Control/loop.text = "looping on"
+	else:
+		loop = false
+		$Control/loop.text = "looping off"
+
+# release focus from text fields when mouse exits them, so that shortcut keys work corecctly
+func _on_min_dB_mouse_exited():
+	$Control/min_dB.get_line_edit().release_focus()
+
+func _on_tilt_mouse_exited():
+	$Control/tilt.get_line_edit().release_focus()
+
+func _on_hide_pressed():
+	match hide_state:
+		HideState.NONE:
+			hide_state = HideState.UI
+			$Control.rect_position.x = screen_size.x
+		HideState.UI:
+			hide_state = HideState.BOTH
+			bar_screen_height = 1.0
+		HideState.BOTH:
+			hide_state = HideState.NONE
+			$Control.rect_position.x = 0
+			bar_screen_height = 1.0 - piano_bar_height
