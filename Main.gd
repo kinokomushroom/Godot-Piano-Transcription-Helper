@@ -7,15 +7,25 @@ var lowest_frequency: float = 27.5
 var magnitude_db_array = []
 var smooth: bool = true
 var averaging_frames: int = 4
+var smoothing_disable_distance: float = 10.0
 var filter: bool = false
 var filtered_magnitude_array = []
 var filter_max_difference: float = 0.1
-var filter_change_speed: float = 0.08
+var filter_appear_speed: float = 0.1
+var filter_disappear_speed: float = 0.2
 var lowest_magnitude: float = -60.0
 var magnitude_decrease_speed: float = 1.5 * lowest_magnitude
 
 var magnitude_bar_width: float = 0.4
 export var gradient: Gradient
+var tilt_amount: float = 0.0
+
+var line_opacity: float = 0.0
+export var line_color: Color
+var line_appear_time: float = 0.2
+var line_disappear_time: float = 0.5
+var line_display_timer: float = 0.0
+var line_display_duration: float = 1.0
 
 var key_white_array = [] # stores information of key color (true if white)
 var piano_bar_height: float = 0.15
@@ -39,6 +49,8 @@ func map_range(value, source_start, source_end, target_start, target_end):
 	mapped_value += target_start
 	return mapped_value
 
+func linear_interpolate(factor: float, value_1, value_2):
+	return (1.0 - factor) * value_1 + factor * value_2
 
 func initialize_values():
 	$Control/startstop.disabled = false
@@ -84,6 +96,11 @@ func analyze_frequencies():
 		if not $AudioStreamPlayer.playing: # do this or weird stuff will happend while paused (spooky)
 			magnitude = Vector2.ZERO
 		var magnitude_db: float = linear2db((magnitude.x + magnitude.y) / 2)
+		
+		# tilt magnitude
+		magnitude_db += map_range(key_index, 0, key_number - 1, -tilt_amount, tilt_amount)
+		
+		# fix infinity errors when magnitude is 0
 		if magnitude_db == -INF:
 			magnitude_db = lowest_magnitude
 		
@@ -93,9 +110,14 @@ func analyze_frequencies():
 			var copied_value: float = magnitude_db_array[key_index][frame + 1]
 			magnitude_db_array[key_index][frame] = copied_value
 			sum += copied_value
-		sum /= averaging_frames
 		if smooth:
-			magnitude_db = sum
+			var average: float = sum / averaging_frames
+			var difference: float = magnitude_db - magnitude_db_array[key_index][averaging_frames - 2]
+			difference = clamp(map_range(difference, 0.0, 20.0, 0.0, 1.0), 0.0, 1.0)
+			# do this so that sudden increases in magnitudes aren't smoothed out
+			magnitude_db = linear_interpolate(difference, average, magnitude_db)
+#			magnitude_db = average
+		magnitude_db_array[key_index][averaging_frames - 1] = magnitude_db
 		
 		# gradually decrease value to make it less jumpy
 		magnitude_db = max(magnitude_db_array[key_index][averaging_frames - 2] + magnitude_decrease_speed * delta, magnitude_db)
@@ -108,45 +130,64 @@ func analyze_frequencies():
 		var right_value: float = magnitude_db_array[key_index + 1][averaging_frames - 1]
 		if center_value >= left_value - filter_max_difference and center_value >= right_value - filter_max_difference:
 			if smooth:
-				filtered_magnitude_array[key_index] = min(1.0, filtered_magnitude_array[key_index] + filter_change_speed)
+				filtered_magnitude_array[key_index] = min(1.0, filtered_magnitude_array[key_index] + 1.0 / filter_appear_speed * delta)
 			else:
 				filtered_magnitude_array[key_index] = 1.0
 		else:
 			if smooth:
-				filtered_magnitude_array[key_index] = max(0.0, filtered_magnitude_array[key_index] - filter_change_speed)
+				filtered_magnitude_array[key_index] = max(0.0, filtered_magnitude_array[key_index] - 1.0 / filter_disappear_speed * delta)
 			else:
 				filtered_magnitude_array[key_index] = 0.0
 
-func draw_magnitude(key_index: int):
-	var magnitude: float = magnitude_db_array[key_index][averaging_frames - 1]
-	var x_position_uniform: float = 1.0 / key_number * (key_index + 0.5)
-	var x_position: float = screen_size.x * x_position_uniform
-	var height_uniform: float = max(0.0, map_range(magnitude, lowest_magnitude, 0.0, 0.0, 1.0))
-	var height: float = screen_size.y * height_uniform
-	var width: float = screen_size.x / float(key_number) * magnitude_bar_width
-	var color: Color = gradient.interpolate(x_position_uniform)
-	if height_uniform < 0.5:
-		color = color.darkened(map_range(height_uniform, 0.0, 0.5, 0.9, 0.0))
-	else:
-		color = color.lightened(map_range(height_uniform, 0.5, 1.0, 0.0, 1.0))
-	if filter:
-		color = color.darkened(1.0 - map_range(filtered_magnitude_array[key_index], 0.0, 1.0, 0.2, 1.0))
-	draw_rect(Rect2(x_position - width / 2, (screen_size.y - height) * bar_screen_height, width, height * bar_screen_height), color)
+func draw_magnitude():
+	for key_index in range(0, key_number):
+		var magnitude: float = magnitude_db_array[key_index][averaging_frames - 1]
+		var x_position_uniform: float = 1.0 / key_number * (key_index + 0.5)
+		var x_position: float = screen_size.x * x_position_uniform
+		var height_uniform: float = max(0.0, map_range(magnitude, lowest_magnitude, 0.0, 0.0, 1.0))
+		var height: float = screen_size.y * height_uniform
+		var width: float = screen_size.x / float(key_number) * magnitude_bar_width
+		var color: Color = gradient.interpolate(x_position_uniform)
+		if height_uniform < 0.5:
+			color = color.darkened(map_range(height_uniform, 0.0, 0.5, 0.9, 0.0))
+		else:
+			color = color.lightened(map_range(height_uniform, 0.5, 1.0, 0.0, 1.0))
+		if filter:
+			color = color.darkened(1.0 - map_range(filtered_magnitude_array[key_index], 0.0, 1.0, 0.2, 1.0))
+		draw_rect(Rect2(x_position - width / 2, (screen_size.y - height) * bar_screen_height, width, height * bar_screen_height), color)
 
-func draw_key(key_index: int):
-	var x_position: float = screen_size.x / float(key_number) * (key_index + 0.5)
-	var width: float = screen_size.x / float(key_number) * piano_bar_width
-	var height: float = screen_size.y * piano_bar_height
-	if key_white_array[key_index]:
-		draw_rect(Rect2(x_position - width / 2, screen_size.y - height, width, height), white_key_color)
+func draw_lines():
+	# calculate line opacity
+	if line_display_timer > 0.0:
+		line_display_timer -= delta
+		line_opacity += 1.0 / line_appear_time * delta
 	else:
-		draw_rect(Rect2(x_position - width / 2, screen_size.y - height, width, height * 0.8), black_key_color)
+		line_opacity -= 1.0 / line_disappear_time * delta
+	line_opacity = clamp(line_opacity, 0.0, 1.0)
+	var color: Color = line_color
+	color.a = line_opacity
+	# draw lines from -120dB to 50dB
+	for db in range(-120, 40, 20):
+		var line_height_left = screen_size.y * map_range(db - tilt_amount, lowest_magnitude, 0.0, 1.0, 0.0) * bar_screen_height
+		var line_height_right = screen_size.y * map_range(db + tilt_amount, lowest_magnitude, 0.0, 1.0, 0.0) * bar_screen_height
+		draw_line(Vector2(0.0, line_height_left), Vector2(screen_size.x, line_height_right), color, 2.0, true)
+	draw_rect(Rect2(0, screen_size.y * bar_screen_height, screen_size.x, screen_size.y), Color.black) # hide lower portion of screen
+
+func draw_key():
+	for key_index in range(0, key_number):
+		var x_position: float = screen_size.x / float(key_number) * (key_index + 0.5)
+		var width: float = screen_size.x / float(key_number) * piano_bar_width
+		var height: float = screen_size.y * piano_bar_height
+		if key_white_array[key_index]:
+			draw_rect(Rect2(x_position - width / 2, screen_size.y - height, width, height), white_key_color)
+		else:
+			draw_rect(Rect2(x_position - width / 2, screen_size.y - height, width, height * 0.8), black_key_color)
 
 func _draw():
 	draw_rect(Rect2(0, 0, screen_size.x, screen_size.y), Color.black)
-	for key_index in range(0, key_number):
-		draw_magnitude(key_index)
-		draw_key(key_index)
+	draw_lines()
+	draw_magnitude()
+	draw_key()
 
 func viewport_size_changed():
 	screen_size = get_viewport().size
@@ -159,10 +200,10 @@ func _ready():
 	
 	# initialize arrays
 	for key_index in range(0, key_number):
-		var history = []
+		var values = []
 		for frame in averaging_frames:
-			history.append(lowest_magnitude)
-		magnitude_db_array.append(history)
+			values.append(lowest_magnitude)
+		magnitude_db_array.append(values)
 		
 		filtered_magnitude_array.append(0)
 		
@@ -257,6 +298,7 @@ func _on_smooth_toggled(button_pressed):
 func _on_min_dB_value_changed(value):
 	lowest_magnitude = value
 	magnitude_decrease_speed = 1.5 * lowest_magnitude
+	line_display_timer = line_display_duration
 
 func _on_filter_toggled(button_pressed):
 	if button_pressed:
@@ -265,3 +307,7 @@ func _on_filter_toggled(button_pressed):
 	else:
 		filter = false
 		$Control/filter.text = "filtering off"
+
+func _on_tilt_value_changed(value):
+	tilt_amount = value
+	line_display_timer = line_display_duration
