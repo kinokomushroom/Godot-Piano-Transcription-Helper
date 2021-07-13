@@ -1,99 +1,124 @@
-[gd_scene load_steps=25 format=2]
+[gd_scene load_steps=31 format=2]
 
 [ext_resource path="res://Main.gd" type="Script" id=1]
 
 [sub_resource type="Gradient" id=1]
 colors = PoolColorArray( 1, 0, 1, 1, 0, 1, 1, 1 )
 
-[sub_resource type="InputEventAction" id=4]
+[sub_resource type="InputEventAction" id=2]
 action = "startstop"
 
 [sub_resource type="ShortCut" id=3]
-shortcut = SubResource( 4 )
+shortcut = SubResource( 2 )
 
-[sub_resource type="InputEventAction" id=5]
+[sub_resource type="InputEventAction" id=4]
 action = "reset"
 
-[sub_resource type="ShortCut" id=6]
-shortcut = SubResource( 5 )
+[sub_resource type="ShortCut" id=5]
+shortcut = SubResource( 4 )
 
-[sub_resource type="InputEventAction" id=19]
+[sub_resource type="InputEventAction" id=6]
 action = "loop"
 
-[sub_resource type="ShortCut" id=20]
-shortcut = SubResource( 19 )
+[sub_resource type="ShortCut" id=7]
+shortcut = SubResource( 6 )
 
-[sub_resource type="InputEventAction" id=7]
+[sub_resource type="InputEventAction" id=8]
 action = "minus1"
 
-[sub_resource type="ShortCut" id=8]
-shortcut = SubResource( 7 )
+[sub_resource type="ShortCut" id=9]
+shortcut = SubResource( 8 )
 
-[sub_resource type="InputEventAction" id=9]
+[sub_resource type="InputEventAction" id=10]
 action = "plus1"
 
-[sub_resource type="ShortCut" id=10]
-shortcut = SubResource( 9 )
+[sub_resource type="ShortCut" id=11]
+shortcut = SubResource( 10 )
 
-[sub_resource type="InputEventAction" id=11]
+[sub_resource type="InputEventAction" id=12]
 action = "minus5"
 
-[sub_resource type="ShortCut" id=12]
-shortcut = SubResource( 11 )
+[sub_resource type="ShortCut" id=13]
+shortcut = SubResource( 12 )
 
-[sub_resource type="InputEventAction" id=13]
+[sub_resource type="InputEventAction" id=14]
 action = "plus5"
 
-[sub_resource type="ShortCut" id=14]
-shortcut = SubResource( 13 )
+[sub_resource type="ShortCut" id=15]
+shortcut = SubResource( 14 )
 
-[sub_resource type="InputEventAction" id=21]
+[sub_resource type="InputEventAction" id=16]
 action = "open"
 
-[sub_resource type="ShortCut" id=22]
-shortcut = SubResource( 21 )
+[sub_resource type="ShortCut" id=17]
+shortcut = SubResource( 16 )
 
-[sub_resource type="InputEventAction" id=23]
+[sub_resource type="InputEventAction" id=18]
 action = "hide"
 
-[sub_resource type="ShortCut" id=24]
-shortcut = SubResource( 23 )
+[sub_resource type="ShortCut" id=19]
+shortcut = SubResource( 18 )
 
-[sub_resource type="InputEventAction" id=15]
+[sub_resource type="InputEventAction" id=20]
 action = "smooth"
 
-[sub_resource type="ShortCut" id=16]
-shortcut = SubResource( 15 )
+[sub_resource type="ShortCut" id=21]
+shortcut = SubResource( 20 )
 
-[sub_resource type="InputEventAction" id=17]
+[sub_resource type="InputEventAction" id=22]
 action = "filter"
 
-[sub_resource type="ShortCut" id=18]
-shortcut = SubResource( 17 )
+[sub_resource type="ShortCut" id=23]
+shortcut = SubResource( 22 )
+
+[sub_resource type="InputEventAction" id=24]
+action = "fullscreen"
+
+[sub_resource type="ShortCut" id=25]
+shortcut = SubResource( 24 )
+
+[sub_resource type="InputEventAction" id=26]
+action = "mute"
+
+[sub_resource type="ShortCut" id=27]
+shortcut = SubResource( 26 )
+
+[sub_resource type="InputEventAction" id=28]
+action = "color"
+
+[sub_resource type="ShortCut" id=29]
+shortcut = SubResource( 28 )
 
 [node name="Main" type="Node2D"]
 script = ExtResource( 1 )
 gradient = SubResource( 1 )
 line_color = Color( 0.137255, 0.137255, 0.137255, 1 )
-white_key_color = Color( 0.721569, 0.721569, 0.721569, 1 )
+white_key_color = Color( 0.270588, 0.270588, 0.270588, 1 )
 black_key_color = Color( 0.0901961, 0.0901961, 0.0901961, 1 )
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+bus = "Analyze"
 
 [node name="Control" type="Control" parent="."]
 margin_right = 1024.0
 margin_bottom = 600.0
 __meta__ = {
+"_edit_lock_": true,
 "_edit_use_anchors_": false
 }
 
 [node name="startstop" type="Button" parent="Control"]
-margin_left = 16.0
-margin_top = 16.0
-margin_right = 144.0
-margin_bottom = 36.0
+anchor_left = 0.5
+anchor_right = 0.5
+margin_left = -64.0
+margin_top = 104.0
+margin_right = 64.0
+margin_bottom = 124.0
+hint_tooltip = "shortcut: (Space)"
 disabled = true
 toggle_mode = true
+shortcut_in_tooltip = false
+action_mode = 0
 shortcut = SubResource( 3 )
 text = "play"
 __meta__ = {
@@ -101,76 +126,104 @@ __meta__ = {
 }
 
 [node name="reset" type="Button" parent="Control"]
-margin_left = 16.0
-margin_top = 112.0
-margin_right = 144.0
-margin_bottom = 132.0
+anchor_left = 0.5
+anchor_right = 0.5
+margin_left = -40.0
+margin_top = 136.0
+margin_right = 40.0
+margin_bottom = 156.0
+hint_tooltip = "shortcut: (R)"
 disabled = true
-shortcut = SubResource( 6 )
+shortcut_in_tooltip = false
+action_mode = 0
+shortcut = SubResource( 5 )
 text = "reset"
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="loop" type="Button" parent="Control"]
-margin_left = 16.0
-margin_top = 144.0
-margin_right = 144.0
-margin_bottom = 164.0
+margin_left = 56.0
+margin_top = 48.0
+margin_right = 184.0
+margin_bottom = 68.0
+hint_tooltip = "shortcut: (L)"
 toggle_mode = true
-shortcut = SubResource( 20 )
+shortcut_in_tooltip = false
+action_mode = 0
+shortcut = SubResource( 7 )
 text = "looping off"
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="minus1" type="Button" parent="Control"]
-margin_left = 16.0
-margin_top = 48.0
-margin_right = 72.0
-margin_bottom = 68.0
+anchor_left = 0.5
+anchor_right = 0.5
+margin_left = -136.0
+margin_top = 104.0
+margin_right = -80.0
+margin_bottom = 124.0
 rect_pivot_offset = Vector2( 40, 10 )
+hint_tooltip = "shortcut: (Down Arrow)"
 disabled = true
-shortcut = SubResource( 8 )
+shortcut_in_tooltip = false
+action_mode = 0
+shortcut = SubResource( 9 )
 text = "-1 s"
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="plus1" type="Button" parent="Control"]
-margin_left = 88.0
-margin_top = 48.0
-margin_right = 144.0
-margin_bottom = 68.0
+anchor_left = 0.5
+anchor_right = 0.5
+margin_left = 80.0
+margin_top = 104.0
+margin_right = 136.0
+margin_bottom = 124.0
 rect_pivot_offset = Vector2( 40, 10 )
+hint_tooltip = "shortcut: (Up Arrow)"
 disabled = true
-shortcut = SubResource( 10 )
+shortcut_in_tooltip = false
+action_mode = 0
+shortcut = SubResource( 11 )
 text = "+1 s"
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="minus5" type="Button" parent="Control"]
-margin_left = 16.0
-margin_top = 80.0
-margin_right = 72.0
-margin_bottom = 100.0
+anchor_left = 0.5
+anchor_right = 0.5
+margin_left = -208.0
+margin_top = 104.0
+margin_right = -152.0
+margin_bottom = 124.0
 rect_pivot_offset = Vector2( 40, 10 )
+hint_tooltip = "shortcut: (Left Arrow)"
 disabled = true
-shortcut = SubResource( 12 )
+shortcut_in_tooltip = false
+action_mode = 0
+shortcut = SubResource( 13 )
 text = "-5 s"
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="plus5" type="Button" parent="Control"]
-margin_left = 88.0
-margin_top = 80.0
-margin_right = 144.0
-margin_bottom = 100.0
+anchor_left = 0.5
+anchor_right = 0.5
+margin_left = 152.0
+margin_top = 104.0
+margin_right = 208.0
+margin_bottom = 124.0
 rect_pivot_offset = Vector2( 40, 10 )
+hint_tooltip = "shortcut: (Right Arrow)"
 disabled = true
-shortcut = SubResource( 14 )
+shortcut_in_tooltip = false
+action_mode = 0
+shortcut = SubResource( 15 )
 text = "+5 s"
 __meta__ = {
 "_edit_use_anchors_": false
@@ -178,10 +231,10 @@ __meta__ = {
 
 [node name="TimeBar" type="HScrollBar" parent="Control"]
 anchor_right = 1.0
-margin_left = 176.0
-margin_top = 24.0
-margin_right = -184.0
-margin_bottom = 36.0
+margin_left = 32.0
+margin_top = 80.0
+margin_right = -32.0
+margin_bottom = 92.0
 max_value = 0.0
 __meta__ = {
 "_edit_use_anchors_": false
@@ -190,10 +243,12 @@ __meta__ = {
 [node name="Color1" type="ColorPickerButton" parent="Control"]
 anchor_left = 1.0
 anchor_right = 1.0
-margin_left = -144.0
-margin_top = 48.0
-margin_right = -88.0
-margin_bottom = 68.0
+margin_left = -400.0
+margin_top = 16.0
+margin_right = -344.0
+margin_bottom = 36.0
+hint_tooltip = "change colour of lower frequencies
+press (C) to change colour mode"
 color = Color( 1, 0, 1, 1 )
 __meta__ = {
 "_edit_use_anchors_": false
@@ -202,37 +257,43 @@ __meta__ = {
 [node name="Color2" type="ColorPickerButton" parent="Control"]
 anchor_left = 1.0
 anchor_right = 1.0
-margin_left = -72.0
+margin_left = -400.0
 margin_top = 48.0
-margin_right = -16.0
+margin_right = -344.0
 margin_bottom = 68.0
+hint_tooltip = "change colour of higher frequencies
+press (C) to change colour mode"
 color = Color( 0, 1, 1, 1 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="open" type="Button" parent="Control"]
-anchor_left = 1.0
-anchor_right = 1.0
-margin_left = -144.0
+margin_left = 56.0
 margin_top = 16.0
-margin_right = -16.0
+margin_right = 184.0
 margin_bottom = 36.0
-shortcut = SubResource( 22 )
+hint_tooltip = "shortcut: (O)
+only .mp3 and .ogg are supported"
+shortcut_in_tooltip = false
+action_mode = 0
+shortcut = SubResource( 17 )
 text = "open file"
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="hide" type="Button" parent="Control"]
-anchor_left = 1.0
-anchor_right = 1.0
-margin_left = -144.0
-margin_top = 208.0
-margin_right = -16.0
-margin_bottom = 228.0
-shortcut = SubResource( 24 )
-text = "hide (h)"
+margin_left = 200.0
+margin_top = 48.0
+margin_right = 328.0
+margin_bottom = 68.0
+hint_tooltip = "shortcut: (H)
+press once to hide UI, press again to hide keyboard, and press again to show everything"
+shortcut_in_tooltip = false
+action_mode = 0
+shortcut = SubResource( 19 )
+text = "hide (H)"
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -240,13 +301,17 @@ __meta__ = {
 [node name="smooth" type="Button" parent="Control"]
 anchor_left = 1.0
 anchor_right = 1.0
-margin_left = -144.0
-margin_top = 80.0
-margin_right = -16.0
-margin_bottom = 100.0
+margin_left = -328.0
+margin_top = 16.0
+margin_right = -200.0
+margin_bottom = 36.0
+hint_tooltip = "shortcut: (S)
+smooths values over several frames, so that it appears less jumpy"
 toggle_mode = true
+shortcut_in_tooltip = false
 pressed = true
-shortcut = SubResource( 16 )
+action_mode = 0
+shortcut = SubResource( 21 )
 text = "smoothing on"
 __meta__ = {
 "_edit_use_anchors_": false
@@ -255,13 +320,32 @@ __meta__ = {
 [node name="filter" type="Button" parent="Control"]
 anchor_left = 1.0
 anchor_right = 1.0
-margin_left = -144.0
-margin_top = 112.0
-margin_right = -16.0
-margin_bottom = 132.0
+margin_left = -184.0
+margin_top = 16.0
+margin_right = -56.0
+margin_bottom = 36.0
+hint_tooltip = "shortcut: (F)
+highlight the peaks of frequencies"
 toggle_mode = true
-shortcut = SubResource( 18 )
+shortcut_in_tooltip = false
+action_mode = 0
+shortcut = SubResource( 23 )
 text = "filtering off"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="full_screen" type="Button" parent="Control"]
+margin_left = 200.0
+margin_top = 16.0
+margin_right = 328.0
+margin_bottom = 36.0
+hint_tooltip = "shortcut: (F11)"
+toggle_mode = true
+shortcut_in_tooltip = false
+action_mode = 0
+shortcut = SubResource( 25 )
+text = "full screen off"
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -280,11 +364,12 @@ __meta__ = {
 }
 
 [node name="Timestamp" type="Label" parent="Control"]
+anchor_left = 1.0
 anchor_right = 1.0
-margin_left = 800.0
-margin_top = 48.0
-margin_right = -184.0
-margin_bottom = 62.0
+margin_left = -96.0
+margin_top = 104.0
+margin_right = -56.0
+margin_bottom = 118.0
 text = "0:00"
 align = 2
 __meta__ = {
@@ -294,10 +379,11 @@ __meta__ = {
 [node name="min_dB" type="SpinBox" parent="Control"]
 anchor_left = 1.0
 anchor_right = 1.0
-margin_left = -96.0
-margin_top = 144.0
-margin_right = -14.0
-margin_bottom = 168.0
+margin_left = -272.0
+margin_top = 48.0
+margin_right = -190.0
+margin_bottom = 72.0
+hint_tooltip = "adjust the minimum dB that is shown"
 min_value = -80.0
 max_value = -20.0
 step = 0.1
@@ -310,10 +396,11 @@ __meta__ = {
 [node name="tilt" type="SpinBox" parent="Control"]
 anchor_left = 1.0
 anchor_right = 1.0
-margin_left = -96.0
-margin_top = 176.0
-margin_right = -14.0
-margin_bottom = 200.0
+margin_left = -136.0
+margin_top = 48.0
+margin_right = -54.0
+margin_bottom = 72.0
+hint_tooltip = "adjust the balance of high and low frequencies"
 min_value = -40.0
 max_value = 40.0
 step = 0.1
@@ -325,10 +412,10 @@ __meta__ = {
 [node name="min_dB_label" type="Label" parent="Control"]
 anchor_left = 1.0
 anchor_right = 1.0
-margin_left = -144.0
-margin_top = 144.0
-margin_right = -98.0
-margin_bottom = 158.0
+margin_left = -320.0
+margin_top = 48.0
+margin_right = -274.0
+margin_bottom = 62.0
 text = "clamp"
 __meta__ = {
 "_edit_use_anchors_": false
@@ -337,11 +424,53 @@ __meta__ = {
 [node name="tilt_label" type="Label" parent="Control"]
 anchor_left = 1.0
 anchor_right = 1.0
-margin_left = -144.0
-margin_top = 176.0
-margin_right = -98.0
-margin_bottom = 190.0
+margin_left = -176.0
+margin_top = 48.0
+margin_right = -130.0
+margin_bottom = 62.0
 text = "tilt"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="mute" type="Button" parent="Control"]
+margin_left = 32.0
+margin_top = -32.0
+margin_right = 88.0
+margin_bottom = -12.0
+toggle_mode = true
+shortcut_in_tooltip = false
+action_mode = 0
+shortcut = SubResource( 27 )
+text = "mute"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="color" type="Button" parent="Control"]
+margin_left = 104.0
+margin_top = -32.0
+margin_right = 160.0
+margin_bottom = -12.0
+shortcut_in_tooltip = false
+action_mode = 0
+shortcut = SubResource( 29 )
+text = "color"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="volume" type="HSlider" parent="Control"]
+margin_left = 56.0
+margin_top = 104.0
+margin_right = 136.0
+margin_bottom = 120.0
+hint_tooltip = "control audio volume (doesn't affect visuals)
+mute by pressing (M)"
+max_value = 1.0
+step = 0.0
+value = 1.0
+allow_lesser = true
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -360,8 +489,12 @@ __meta__ = {
 [connection signal="pressed" from="Control/hide" to="." method="_on_hide_pressed"]
 [connection signal="toggled" from="Control/smooth" to="." method="_on_smooth_toggled"]
 [connection signal="toggled" from="Control/filter" to="." method="_on_filter_toggled"]
+[connection signal="toggled" from="Control/full_screen" to="." method="_on_full_screen_toggled"]
 [connection signal="file_selected" from="Control/FileDialog" to="." method="_on_FileDialog_file_selected"]
 [connection signal="mouse_exited" from="Control/min_dB" to="." method="_on_min_dB_mouse_exited"]
 [connection signal="value_changed" from="Control/min_dB" to="." method="_on_min_dB_value_changed"]
 [connection signal="mouse_exited" from="Control/tilt" to="." method="_on_tilt_mouse_exited"]
 [connection signal="value_changed" from="Control/tilt" to="." method="_on_tilt_value_changed"]
+[connection signal="toggled" from="Control/mute" to="." method="_on_mute_toggled"]
+[connection signal="pressed" from="Control/color" to="." method="_on_color_pressed"]
+[connection signal="value_changed" from="Control/volume" to="." method="_on_volume_value_changed"]
