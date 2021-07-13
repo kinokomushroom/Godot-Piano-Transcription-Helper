@@ -1,4 +1,4 @@
-[gd_scene load_steps=29 format=2]
+[gd_scene load_steps=31 format=2]
 
 [ext_resource path="res://Main.gd" type="Script" id=1]
 
@@ -83,11 +83,17 @@ action = "mute"
 [sub_resource type="ShortCut" id=27]
 shortcut = SubResource( 26 )
 
+[sub_resource type="InputEventAction" id=28]
+action = "color"
+
+[sub_resource type="ShortCut" id=29]
+shortcut = SubResource( 28 )
+
 [node name="Main" type="Node2D"]
 script = ExtResource( 1 )
 gradient = SubResource( 1 )
 line_color = Color( 0.137255, 0.137255, 0.137255, 1 )
-white_key_color = Color( 0.721569, 0.721569, 0.721569, 1 )
+white_key_color = Color( 0.270588, 0.270588, 0.270588, 1 )
 black_key_color = Color( 0.0901961, 0.0901961, 0.0901961, 1 )
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
@@ -108,8 +114,10 @@ margin_left = -64.0
 margin_top = 104.0
 margin_right = 64.0
 margin_bottom = 124.0
+hint_tooltip = "shortcut: (Space)"
 disabled = true
 toggle_mode = true
+shortcut_in_tooltip = false
 action_mode = 0
 shortcut = SubResource( 3 )
 text = "play"
@@ -124,7 +132,9 @@ margin_left = -40.0
 margin_top = 136.0
 margin_right = 40.0
 margin_bottom = 156.0
+hint_tooltip = "shortcut: (R)"
 disabled = true
+shortcut_in_tooltip = false
 action_mode = 0
 shortcut = SubResource( 5 )
 text = "reset"
@@ -137,7 +147,9 @@ margin_left = 56.0
 margin_top = 48.0
 margin_right = 184.0
 margin_bottom = 68.0
+hint_tooltip = "shortcut: (L)"
 toggle_mode = true
+shortcut_in_tooltip = false
 action_mode = 0
 shortcut = SubResource( 7 )
 text = "looping off"
@@ -153,7 +165,9 @@ margin_top = 104.0
 margin_right = -80.0
 margin_bottom = 124.0
 rect_pivot_offset = Vector2( 40, 10 )
+hint_tooltip = "shortcut: (Down Arrow)"
 disabled = true
+shortcut_in_tooltip = false
 action_mode = 0
 shortcut = SubResource( 9 )
 text = "-1 s"
@@ -169,7 +183,9 @@ margin_top = 104.0
 margin_right = 136.0
 margin_bottom = 124.0
 rect_pivot_offset = Vector2( 40, 10 )
+hint_tooltip = "shortcut: (Up Arrow)"
 disabled = true
+shortcut_in_tooltip = false
 action_mode = 0
 shortcut = SubResource( 11 )
 text = "+1 s"
@@ -185,7 +201,9 @@ margin_top = 104.0
 margin_right = -152.0
 margin_bottom = 124.0
 rect_pivot_offset = Vector2( 40, 10 )
+hint_tooltip = "shortcut: (Left Arrow)"
 disabled = true
+shortcut_in_tooltip = false
 action_mode = 0
 shortcut = SubResource( 13 )
 text = "-5 s"
@@ -201,7 +219,9 @@ margin_top = 104.0
 margin_right = 208.0
 margin_bottom = 124.0
 rect_pivot_offset = Vector2( 40, 10 )
+hint_tooltip = "shortcut: (Right Arrow)"
 disabled = true
+shortcut_in_tooltip = false
 action_mode = 0
 shortcut = SubResource( 15 )
 text = "+5 s"
@@ -227,6 +247,8 @@ margin_left = -400.0
 margin_top = 16.0
 margin_right = -344.0
 margin_bottom = 36.0
+hint_tooltip = "change colour of lower frequencies
+press (C) to change colour mode"
 color = Color( 1, 0, 1, 1 )
 __meta__ = {
 "_edit_use_anchors_": false
@@ -239,6 +261,8 @@ margin_left = -400.0
 margin_top = 48.0
 margin_right = -344.0
 margin_bottom = 68.0
+hint_tooltip = "change colour of higher frequencies
+press (C) to change colour mode"
 color = Color( 0, 1, 1, 1 )
 __meta__ = {
 "_edit_use_anchors_": false
@@ -249,6 +273,9 @@ margin_left = 56.0
 margin_top = 16.0
 margin_right = 184.0
 margin_bottom = 36.0
+hint_tooltip = "shortcut: (O)
+only .mp3 and .ogg are supported"
+shortcut_in_tooltip = false
 action_mode = 0
 shortcut = SubResource( 17 )
 text = "open file"
@@ -261,6 +288,9 @@ margin_left = 200.0
 margin_top = 48.0
 margin_right = 328.0
 margin_bottom = 68.0
+hint_tooltip = "shortcut: (H)
+press once to hide UI, press again to hide keyboard, and press again to show everything"
+shortcut_in_tooltip = false
 action_mode = 0
 shortcut = SubResource( 19 )
 text = "hide (H)"
@@ -275,7 +305,10 @@ margin_left = -328.0
 margin_top = 16.0
 margin_right = -200.0
 margin_bottom = 36.0
+hint_tooltip = "shortcut: (S)
+smooths values over several frames, so that it appears less jumpy"
 toggle_mode = true
+shortcut_in_tooltip = false
 pressed = true
 action_mode = 0
 shortcut = SubResource( 21 )
@@ -291,7 +324,10 @@ margin_left = -184.0
 margin_top = 16.0
 margin_right = -56.0
 margin_bottom = 36.0
+hint_tooltip = "shortcut: (F)
+highlight the peaks of frequencies"
 toggle_mode = true
+shortcut_in_tooltip = false
 action_mode = 0
 shortcut = SubResource( 23 )
 text = "filtering off"
@@ -304,7 +340,9 @@ margin_left = 200.0
 margin_top = 16.0
 margin_right = 328.0
 margin_bottom = 36.0
+hint_tooltip = "shortcut: (F11)"
 toggle_mode = true
+shortcut_in_tooltip = false
 action_mode = 0
 shortcut = SubResource( 25 )
 text = "full screen off"
@@ -345,6 +383,7 @@ margin_left = -272.0
 margin_top = 48.0
 margin_right = -190.0
 margin_bottom = 72.0
+hint_tooltip = "adjust the minimum dB that is shown"
 min_value = -80.0
 max_value = -20.0
 step = 0.1
@@ -361,6 +400,7 @@ margin_left = -136.0
 margin_top = 48.0
 margin_right = -54.0
 margin_bottom = 72.0
+hint_tooltip = "adjust the balance of high and low frequencies"
 min_value = -40.0
 max_value = 40.0
 step = 0.1
@@ -399,9 +439,23 @@ margin_top = -32.0
 margin_right = 88.0
 margin_bottom = -12.0
 toggle_mode = true
+shortcut_in_tooltip = false
 action_mode = 0
 shortcut = SubResource( 27 )
 text = "mute"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="color" type="Button" parent="Control"]
+margin_left = 104.0
+margin_top = -32.0
+margin_right = 160.0
+margin_bottom = -12.0
+shortcut_in_tooltip = false
+action_mode = 0
+shortcut = SubResource( 29 )
+text = "color"
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -411,6 +465,8 @@ margin_left = 56.0
 margin_top = 104.0
 margin_right = 136.0
 margin_bottom = 120.0
+hint_tooltip = "control audio volume (doesn't affect visuals)
+mute by pressing (M)"
 max_value = 1.0
 step = 0.0
 value = 1.0
@@ -440,4 +496,5 @@ __meta__ = {
 [connection signal="mouse_exited" from="Control/tilt" to="." method="_on_tilt_mouse_exited"]
 [connection signal="value_changed" from="Control/tilt" to="." method="_on_tilt_value_changed"]
 [connection signal="toggled" from="Control/mute" to="." method="_on_mute_toggled"]
+[connection signal="pressed" from="Control/color" to="." method="_on_color_pressed"]
 [connection signal="value_changed" from="Control/volume" to="." method="_on_volume_value_changed"]

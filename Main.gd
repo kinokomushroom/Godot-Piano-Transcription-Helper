@@ -17,6 +17,12 @@ var lowest_magnitude: float = -60.0
 var absolute_lowest_magnitude: float = -80.0
 var magnitude_decrease_speed: float = 1.5 * lowest_magnitude
 
+var color_array = []
+enum ColorMode {USER, GRADIENT_CHANGE, SINGLE_CHANGE, RAINBOW}
+var color_mode = ColorMode.USER
+var time: float = 0.0
+var color_change_speed: float = 60
+
 var magnitude_bar_width: float = 0.4
 export var gradient: Gradient
 var tilt_amount: float = 0.0
@@ -123,6 +129,33 @@ func control_playback():
 			$AudioStreamPlayer.seek(play_position)
 			scrubbing = false
 
+func update_colors():
+	match color_mode:
+		ColorMode.USER:
+			pass
+		ColorMode.GRADIENT_CHANGE:
+			var hue_1: float = time / color_change_speed
+			var hue_2: float = hue_1 + 1.0 / 3.0
+			hue_1 -= floor(hue_1)
+			hue_2 -= floor(hue_2)
+			gradient.set_color(0, Color.from_hsv(hue_1, 1.0, 1.0))
+			gradient.set_color(1, Color.from_hsv(hue_2, 1.0, 1.0))
+		ColorMode.SINGLE_CHANGE:
+			var hue: float = time / color_change_speed + 2.0 / 3.0
+			hue -= floor(hue)
+			gradient.set_color(0, Color.from_hsv(hue, 0.8, 1.0))
+			gradient.set_color(1, Color.from_hsv(hue, 0.8, 1.0))
+	if not color_mode == ColorMode.RAINBOW:
+		for key_index in range(0, key_number):
+			var x_position_uniform: float = 1.0 / key_number * (key_index + 0.5)
+			color_array[key_index] = gradient.interpolate(x_position_uniform)
+	else:
+		for key_index in range(0, key_number):
+			var x_position_uniform: float = 1.0 / key_number * (key_index + 0.5)
+			var hue: float = x_position_uniform + time / color_change_speed
+			hue -= floor(hue)
+			color_array[key_index] = Color.from_hsv(hue, 1.0, 1.0)
+
 func analyze_frequencies():
 	if not $AudioStreamPlayer.playing:
 		# stop processing when paused, so that it appears frozen
@@ -181,7 +214,7 @@ func draw_magnitude():
 		var height_uniform: float = max(0.0, map_range(magnitude, lowest_magnitude, 0.0, 0.0, 1.0))
 		var height: float = screen_size.y * height_uniform
 		var width: float = screen_size.x / float(key_number) * magnitude_bar_width
-		var color: Color = gradient.interpolate(x_position_uniform)
+		var color: Color = color_array[key_index]
 		var alpha: float = 1.0
 		if height_uniform < 0.5:
 			alpha *= map_range(height_uniform, 0.0, 0.5, 0.1, 1.0)
@@ -215,13 +248,24 @@ func draw_key():
 		var x_position: float = screen_size.x / float(key_number) * (key_index + 0.5)
 		var width: float = screen_size.x / float(key_number) * piano_bar_width
 		var height: float = screen_size.y * piano_bar_height
+		# calculate the colour
+		var magnitude: float = magnitude_db_array[key_index][averaging_frames - 1]
+		var magnitude_normalized: float = clamp(map_range(magnitude, lowest_magnitude, 0.0, 0.0, 2.0), 0.0, 2.0)
+		var emit_color: Color = color_array[key_index]
+		if magnitude_normalized >= 1.0:
+			emit_color = emit_color.lightened(map_range(magnitude_normalized, 1.0, 2.0, 0.0, 1.0))
+		var factor: float = filtered_magnitude_array[key_index] * min(magnitude_normalized, 1.0)
 		if key_white_array[key_index]:
+			var final_color: Color = white_key_color.linear_interpolate(emit_color, factor)
 			draw_rect(Rect2(x_position - width / 2, screen_size.y - height, width, height), white_key_color)
+			draw_rect(Rect2(x_position - width / 2, screen_size.y - height, width, height * 0.8), final_color)
 		else:
-#			draw_rect(Rect2(x_position - width / 2, screen_size.y - height, width, height * 0.8), black_key_color)
+			var final_color: Color = black_key_color.linear_interpolate(emit_color, factor)
 			draw_rect(Rect2(x_position - width / 2, screen_size.y - height, width, height), black_key_color)
+			draw_rect(Rect2(x_position - width / 2, screen_size.y - height, width, height * 0.5), final_color)
 
 func _draw():
+	update_colors()
 	draw_rect(Rect2(0, 0, screen_size.x, screen_size.y), Color.black)
 	draw_lines()
 	draw_magnitude()
@@ -252,9 +296,13 @@ func _ready():
 		for black_position in [1, 4, 6, 9, 11]:
 			if (key_index + 12 - black_position) % 12 == 0:
 				key_white_array[key_index] = false
+		
+		var x_position_uniform: float = 1.0 / key_number * (key_index + 0.5)
+		color_array.append(gradient.interpolate(x_position_uniform))
 
 func _process(_delta):
 	delta = _delta
+	time += delta
 	
 	control_playback()
 	
@@ -386,3 +434,17 @@ func _on_mute_toggled(button_pressed):
 		$Control/volume.value = -1.0
 	else:
 		$Control/volume.value = actual_volume
+
+
+func _on_color_pressed():
+	match color_mode:
+		ColorMode.USER:
+			color_mode = ColorMode.GRADIENT_CHANGE
+		ColorMode.GRADIENT_CHANGE:
+			color_mode = ColorMode.SINGLE_CHANGE
+		ColorMode.SINGLE_CHANGE:
+			color_mode = ColorMode.RAINBOW
+		ColorMode.RAINBOW:
+			color_mode = ColorMode.USER
+			gradient.set_color(0, $Control/Color1.color)
+			gradient.set_color(1, $Control/Color2.color)
