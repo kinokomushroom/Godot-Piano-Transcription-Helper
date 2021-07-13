@@ -36,7 +36,7 @@ export var white_key_color: Color
 export var black_key_color: Color
 
 var delta: float = 1.0 / 60.0
-var spectrum: AudioEffectSpectrumAnalyzerInstance = AudioServer.get_bus_effect_instance(0, 0)
+var spectrum: AudioEffectSpectrumAnalyzerInstance = AudioServer.get_bus_effect_instance(1, 0)
 var stream_length: float = 0.0
 
 var file_chosen: bool = false
@@ -49,6 +49,8 @@ var reached_end: bool = false
 
 enum HideState {NONE, UI, BOTH}
 var hide_state = HideState.NONE
+
+var actual_volume: float = 1.0
 
 func map_range(value, source_start, source_end, target_start, target_end):
 	var mapped_value: float = value - source_start
@@ -361,3 +363,26 @@ func _on_hide_pressed():
 			hide_state = HideState.NONE
 			$Control.rect_position.x = 0
 			bar_screen_height = 1.0 - piano_bar_height
+
+func _on_full_screen_toggled(button_pressed):
+	if button_pressed:
+		$Control/full_screen.text = "full screen on"
+		OS.window_fullscreen = true
+	else:
+		$Control/full_screen.text = "full screen off"
+		OS.window_fullscreen = false
+
+func _on_volume_value_changed(value):
+	# make volume control sound as linear as possible
+	var clamped_value: float = clamp(value, 0.0, 1.0)
+	var volume_db: float = map_range(pow(clamped_value, 0.25), 0.0, 1.0, -80.0, 0.0)
+	AudioServer.set_bus_volume_db(0, volume_db)
+	if value != -1.0: # record value when not muted
+		actual_volume = value
+
+
+func _on_mute_toggled(button_pressed):
+	if button_pressed:
+		$Control/volume.value = -1.0
+	else:
+		$Control/volume.value = actual_volume

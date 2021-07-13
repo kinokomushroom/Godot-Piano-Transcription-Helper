@@ -1,7 +1,9 @@
 # Godot Piano Transcription Helper
 A tool to analyze music files by frequencies of every piano key, and display them in nice colours.
-.mp3 and .ogg files are supported.
-Created on Godot 3.3.2.
+
+mp3 and ogg files are supported.
+
+Created on Godot 3.3.2. Only works on Godot 3.3 or higher.
 
 
 ### TODO:
@@ -19,3 +21,8 @@ Created on Godot 3.3.2.
 - ~~Add lines to display current clamp and tilt value~~ **done!**
 - ~~Add loop mode~~ **done!**
 - ~~Fix bug: shortcut keys don't work when text fields are in focus~~ **done!**
+- ~~Rearrange UI~~
+- ~~Add volume control and mute function~~
+- ~~Add full screen mode~~
+- Add UI hints
+- Add secret colour mode

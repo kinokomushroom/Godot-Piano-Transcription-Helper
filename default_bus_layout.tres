@@ -6,6 +6,11 @@ buffer_length = 4.0
 fft_size = 4
 
 [resource]
-bus/0/volume_db = -0.130497
-bus/0/effect/0/effect = SubResource( 1 )
-bus/0/effect/0/enabled = true
+bus/1/name = "Analyze"
+bus/1/solo = false
+bus/1/mute = false
+bus/1/bypass_fx = false
+bus/1/volume_db = 0.0
+bus/1/send = "New Bus"
+bus/1/effect/0/effect = SubResource( 1 )
+bus/1/effect/0/enabled = true
