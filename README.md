@@ -25,3 +25,6 @@ Created on Godot 3.3.2. Only works on Godot 3.3 or higher.
 - ~~Add full screen mode~~ **done!**
 - ~~Add UI hints~~ **done!**
 - ~~Add secret colour mode~~ **done!**
+- Make hide button reappear when UI is hidden
+- Make C keys easier to identify
+- Add track tempo scaling feature

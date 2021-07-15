@@ -47,7 +47,7 @@ var stream_length: float = 0.0
 
 var file_chosen: bool = false
 var play_position: float = 0.0
-var end_cut: float = 0.05
+var end_cut: float = 0.0005
 var playing_mode: bool = false
 var scrubbing: bool = false
 var loop: bool = false
@@ -78,12 +78,12 @@ func initialize_values():
 	playing_mode = false
 	play_position = 0.0
 	stream_length = $AudioStreamPlayer.stream.get_length()
-	$Control/TimeBar.max_value = stream_length - end_cut
+	$Control/TimeBar.max_value = stream_length * (1.0 - end_cut)
 	$Control/TimeBar.value = play_position
 	$Control/startstop.pressed = false
 
 func change_time(time):
-	play_position = clamp(time, 0.0, stream_length - end_cut)
+	play_position = clamp(time, 0.0, stream_length * (1.0 - end_cut))
 	$Control/TimeBar.value = play_position
 	$AudioStreamPlayer.seek(play_position)
 
@@ -104,7 +104,7 @@ func import_ogg(path: String):
 
 func control_playback():
 	if file_chosen:
-		reached_end = play_position >= stream_length - end_cut
+		reached_end = play_position >= stream_length * (1.0 - end_cut)
 		var stream_playing: bool = $AudioStreamPlayer.playing
 		if not scrubbing:
 			if playing_mode:
@@ -129,32 +129,35 @@ func control_playback():
 			$AudioStreamPlayer.seek(play_position)
 			scrubbing = false
 
+func color_from_hue(hue: float):
+	return Color.from_hsv(hue - floor(hue), 1.0, 1.0)
+
 func update_colors():
 	match color_mode:
 		ColorMode.USER:
-			pass
+			for key_index in range(0, key_number):
+				var x_position_uniform: float = 1.0 / key_number * (key_index + 0.5)
+				color_array[key_index] = gradient.interpolate(x_position_uniform)
 		ColorMode.GRADIENT_CHANGE:
 			var hue_1: float = time / color_change_speed
 			var hue_2: float = hue_1 + 1.0 / 3.0
-			hue_1 -= floor(hue_1)
-			hue_2 -= floor(hue_2)
-			gradient.set_color(0, Color.from_hsv(hue_1, 1.0, 1.0))
-			gradient.set_color(1, Color.from_hsv(hue_2, 1.0, 1.0))
+			gradient.set_color(0, color_from_hue(hue_1))
+			gradient.set_color(1, color_from_hue(hue_2))
+			for key_index in range(0, key_number):
+				var x_position_uniform: float = 1.0 / key_number * (key_index + 0.5)
+				var color: Color = color_from_hue(gradient.interpolate(x_position_uniform).h)
+				color = color.lightened(map_range(abs(x_position_uniform - 0.5), 0.0, 0.5, 0.5, 0.0))
+				color_array[key_index] = color
 		ColorMode.SINGLE_CHANGE:
 			var hue: float = time / color_change_speed + 2.0 / 3.0
-			hue -= floor(hue)
-			gradient.set_color(0, Color.from_hsv(hue, 0.8, 1.0))
-			gradient.set_color(1, Color.from_hsv(hue, 0.8, 1.0))
-	if not color_mode == ColorMode.RAINBOW:
-		for key_index in range(0, key_number):
-			var x_position_uniform: float = 1.0 / key_number * (key_index + 0.5)
-			color_array[key_index] = gradient.interpolate(x_position_uniform)
-	else:
-		for key_index in range(0, key_number):
-			var x_position_uniform: float = 1.0 / key_number * (key_index + 0.5)
-			var hue: float = x_position_uniform + time / color_change_speed
-			hue -= floor(hue)
-			color_array[key_index] = Color.from_hsv(hue, 1.0, 1.0)
+			var color: Color = color_from_hue(hue).lightened(0.4)
+			for key_index in range(0, key_number):
+				color_array[key_index] = color
+		ColorMode.RAINBOW:
+			for key_index in range(0, key_number):
+				var x_position_uniform: float = 1.0 / key_number * (key_index + 0.5)
+				var hue: float = x_position_uniform + time / color_change_speed
+				color_array[key_index] = color_from_hue(color_from_hue(hue).h).lightened(0.2)
 
 func analyze_frequencies():
 	if not $AudioStreamPlayer.playing:
@@ -314,6 +317,7 @@ func _process(_delta):
 	analyze_frequencies()
 	update()
 #	print(magnitude_db_array[40])
+#	print(play_position)
 
 func _on_startstop_toggled(button_pressed):
 	if button_pressed == true:
