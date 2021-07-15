@@ -1,8 +1,12 @@
-[gd_resource type="AudioBusLayout" load_steps=2 format=2]
+[gd_resource type="AudioBusLayout" load_steps=3 format=2]
 
 [sub_resource type="AudioEffectSpectrumAnalyzer" id=1]
 resource_name = "SpectrumAnalyzer"
 buffer_length = 4.0
+fft_size = 4
+
+[sub_resource type="AudioEffectPitchShift" id=2]
+resource_name = "PitchShift"
 fft_size = 4
 
 [resource]
@@ -11,6 +15,14 @@ bus/1/solo = false
 bus/1/mute = false
 bus/1/bypass_fx = false
 bus/1/volume_db = 0.0
-bus/1/send = "New Bus"
+bus/1/send = "PitchShifted"
 bus/1/effect/0/effect = SubResource( 1 )
 bus/1/effect/0/enabled = true
+bus/2/name = "PitchShifted"
+bus/2/solo = false
+bus/2/mute = false
+bus/2/bypass_fx = false
+bus/2/volume_db = 0.0
+bus/2/send = "Analyze"
+bus/2/effect/0/effect = SubResource( 2 )
+bus/2/effect/0/enabled = true

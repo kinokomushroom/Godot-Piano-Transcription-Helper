@@ -40,6 +40,11 @@ var piano_bar_width: float = 0.9
 onready var bar_screen_height: float = 1.0 - piano_bar_height
 export var white_key_color: Color
 export var black_key_color: Color
+var white_key_height: float = 0.8
+var black_key_height: float = 0.5
+var c_length: float = 0.05
+export var c_color: Color
+export var middle_c_color: Color
 
 var delta: float = 1.0 / 60.0
 var spectrum: AudioEffectSpectrumAnalyzerInstance = AudioServer.get_bus_effect_instance(1, 0)
@@ -47,7 +52,8 @@ var stream_length: float = 0.0
 
 var file_chosen: bool = false
 var play_position: float = 0.0
-var end_cut: float = 0.0005
+var end_cut_multiply: float = 0.0005
+var end_cut_constant: float = 0.1
 var playing_mode: bool = false
 var scrubbing: bool = false
 var loop: bool = false
@@ -78,12 +84,13 @@ func initialize_values():
 	playing_mode = false
 	play_position = 0.0
 	stream_length = $AudioStreamPlayer.stream.get_length()
-	$Control/TimeBar.max_value = stream_length * (1.0 - end_cut)
+	stream_length -= max(stream_length * end_cut_multiply, end_cut_constant) # make it a bit smaller because $AudioStreamPlayer.stream.get_length() seems a bit longer for some reason
+	$Control/TimeBar.max_value = stream_length
 	$Control/TimeBar.value = play_position
 	$Control/startstop.pressed = false
 
-func change_time(time):
-	play_position = clamp(time, 0.0, stream_length * (1.0 - end_cut))
+func change_time(new_time):
+	play_position = clamp(new_time, 0.0, stream_length)
 	$Control/TimeBar.value = play_position
 	$AudioStreamPlayer.seek(play_position)
 
@@ -104,7 +111,7 @@ func import_ogg(path: String):
 
 func control_playback():
 	if file_chosen:
-		reached_end = play_position >= stream_length * (1.0 - end_cut)
+		reached_end = play_position >= stream_length
 		var stream_playing: bool = $AudioStreamPlayer.playing
 		if not scrubbing:
 			if playing_mode:
@@ -158,6 +165,15 @@ func update_colors():
 				var x_position_uniform: float = 1.0 / key_number * (key_index + 0.5)
 				var hue: float = x_position_uniform + time / color_change_speed
 				color_array[key_index] = color_from_hue(color_from_hue(hue).h).lightened(0.2)
+
+func change_speed(speed: float):
+	if speed == 1.0:
+		$AudioStreamPlayer.bus = "Analyze"
+		$AudioStreamPlayer.pitch_scale = 1.0
+	else:
+		$AudioStreamPlayer.bus = "PitchShifted"
+		$AudioStreamPlayer.pitch_scale = speed
+		AudioServer.get_bus_effect(2, 0).pitch_scale = 1.0 / speed
 
 func analyze_frequencies():
 	if not $AudioStreamPlayer.playing:
@@ -261,11 +277,24 @@ func draw_key():
 		if key_white_array[key_index]:
 			var final_color: Color = white_key_color.linear_interpolate(emit_color, factor)
 			draw_rect(Rect2(x_position - width / 2, screen_size.y - height, width, height), white_key_color)
-			draw_rect(Rect2(x_position - width / 2, screen_size.y - height, width, height * 0.8), final_color)
+			draw_rect(Rect2(x_position - width / 2, screen_size.y - height, width, height * white_key_height), final_color)
 		else:
 			var final_color: Color = black_key_color.linear_interpolate(emit_color, factor)
 			draw_rect(Rect2(x_position - width / 2, screen_size.y - height, width, height), black_key_color)
-			draw_rect(Rect2(x_position - width / 2, screen_size.y - height, width, height * 0.5), final_color)
+			draw_rect(Rect2(x_position - width / 2, screen_size.y - height, width, height * black_key_height), final_color)
+
+func draw_c():
+	var height: float = screen_size.y * piano_bar_height * c_length
+	var width: float = screen_size.x / float(key_number) * piano_bar_width
+	for c_index in 8:
+		var key_index: int = 3 + c_index * 12
+		var x_position: float = screen_size.x / float(key_number) * (key_index + 0.5)
+		if c_index != 3:
+#			draw_circle(Vector2(x_position, y_position), radius, circle_color)
+			draw_rect(Rect2(x_position - width / 2, screen_size.y - height, width, height), c_color)
+		else:
+#			draw_circle(Vector2(x_position, y_position), radius, center_circle_color)
+			draw_rect(Rect2(x_position - width / 2, screen_size.y - height, width, height), middle_c_color)
 
 func _draw():
 	update_colors()
@@ -274,10 +303,12 @@ func _draw():
 	draw_magnitude()
 	if hide_state != HideState.BOTH:
 		draw_key()
+		draw_c()
 
 func viewport_size_changed():
 	screen_size = get_viewport().size
 	$Control.rect_size = screen_size
+	$ControlHide.rect_size = screen_size
 	if hide_state != HideState.NONE:
 		$Control.rect_position.x = screen_size.x
 
@@ -310,7 +341,7 @@ func _process(_delta):
 	control_playback()
 	
 	# display time position
-	var minutes: int = floor(play_position / 60)
+	var minutes: int = int(floor(play_position / 60))
 	var seconds: int = int(play_position) % 60
 	$Control/Timestamp.text = "%d:%02d" % [minutes, seconds]
 	
@@ -366,10 +397,8 @@ func _on_TimeBar_scrolling():
 func _on_smooth_toggled(button_pressed):
 	if button_pressed:
 		smooth = true
-		$Control/smooth.text = "smoothing on"
 	else:
 		smooth = false
-		$Control/smooth.text = "smoothing off"
 
 func _on_min_dB_value_changed(value):
 	lowest_magnitude = value
@@ -379,10 +408,8 @@ func _on_min_dB_value_changed(value):
 func _on_filter_toggled(button_pressed):
 	if button_pressed:
 		filter = true
-		$Control/filter.text = "filtering on"
 	else:
 		filter = false
-		$Control/filter.text = "filtering off"
 
 func _on_tilt_value_changed(value):
 	tilt_amount = value
@@ -391,10 +418,8 @@ func _on_tilt_value_changed(value):
 func _on_loop_toggled(button_pressed):
 	if button_pressed:
 		loop = true
-		$Control/loop.text = "looping on"
 	else:
 		loop = false
-		$Control/loop.text = "looping off"
 
 # release focus from text fields when mouse exits them, so that shortcut keys work corecctly
 func _on_min_dB_mouse_exited():
@@ -408,20 +433,22 @@ func _on_hide_pressed():
 		HideState.NONE:
 			hide_state = HideState.UI
 			$Control.rect_position.x = screen_size.x
+			$ControlHide/HideRegion/hide_hidden.visible = true
+			$ControlHide/HideRegion/hide_hidden.text = "hide keyboard"
 		HideState.UI:
 			hide_state = HideState.BOTH
 			bar_screen_height = 1.0
+			$ControlHide/HideRegion/hide_hidden.text = "unhide all"
 		HideState.BOTH:
 			hide_state = HideState.NONE
 			$Control.rect_position.x = 0
 			bar_screen_height = 1.0 - piano_bar_height
+			$ControlHide/HideRegion/hide_hidden.visible = false
 
 func _on_full_screen_toggled(button_pressed):
 	if button_pressed:
-		$Control/full_screen.text = "full screen on"
 		OS.window_fullscreen = true
 	else:
-		$Control/full_screen.text = "full screen off"
 		OS.window_fullscreen = false
 
 func _on_volume_value_changed(value):
@@ -439,7 +466,6 @@ func _on_mute_toggled(button_pressed):
 	else:
 		$Control/volume.value = actual_volume
 
-
 func _on_color_pressed():
 	match color_mode:
 		ColorMode.USER:
@@ -452,3 +478,24 @@ func _on_color_pressed():
 			color_mode = ColorMode.USER
 			gradient.set_color(0, $Control/Color1.color)
 			gradient.set_color(1, $Control/Color2.color)
+
+func _on_HideRegion_mouse_entered():
+	if hide_state != HideState.NONE:
+		$ControlHide/HideRegion/hide_hidden.visible = true
+
+func _on_HideRegion_mouse_exited():
+	if hide_state != HideState.NONE:
+		$ControlHide/HideRegion/hide_hidden.visible = false
+
+func _on_OptionButton_item_selected(index):
+	match index:
+		0: # speed is 2.0
+			change_speed(2.0)
+		1: # speed is 1.5
+			change_speed(1.5)
+		2: # speed is 1.0
+			change_speed(1.0)
+		3: # speed is 0.8
+			change_speed(0.8)
+		4: # speed is 0.5
+			change_speed(0.5)

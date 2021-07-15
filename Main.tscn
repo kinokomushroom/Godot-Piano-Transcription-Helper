@@ -5,6 +5,12 @@
 [sub_resource type="Gradient" id=1]
 colors = PoolColorArray( 1, 0, 1, 1, 0, 1, 1, 1 )
 
+[sub_resource type="InputEventAction" id=18]
+action = "hide"
+
+[sub_resource type="ShortCut" id=19]
+shortcut = SubResource( 18 )
+
 [sub_resource type="InputEventAction" id=2]
 action = "startstop"
 
@@ -53,12 +59,6 @@ action = "open"
 [sub_resource type="ShortCut" id=17]
 shortcut = SubResource( 16 )
 
-[sub_resource type="InputEventAction" id=18]
-action = "hide"
-
-[sub_resource type="ShortCut" id=19]
-shortcut = SubResource( 18 )
-
 [sub_resource type="InputEventAction" id=20]
 action = "smooth"
 
@@ -95,9 +95,48 @@ gradient = SubResource( 1 )
 line_color = Color( 0.137255, 0.137255, 0.137255, 1 )
 white_key_color = Color( 0.270588, 0.270588, 0.270588, 1 )
 black_key_color = Color( 0.0901961, 0.0901961, 0.0901961, 1 )
+c_color = Color( 0.372549, 0.372549, 0.372549, 1 )
+middle_c_color = Color( 0.470588, 0.470588, 0.470588, 1 )
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
 bus = "Analyze"
+
+[node name="ControlHide" type="Control" parent="."]
+margin_right = 1024.0
+margin_bottom = 600.0
+__meta__ = {
+"_edit_lock_": true,
+"_edit_use_anchors_": false
+}
+
+[node name="HideRegion" type="Control" parent="ControlHide"]
+anchor_left = 0.5
+anchor_right = 0.5
+margin_left = -80.0
+margin_right = 80.0
+margin_bottom = 56.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="hide_hidden" type="Button" parent="ControlHide/HideRegion"]
+visible = false
+anchor_left = 0.5
+anchor_right = 0.5
+margin_left = -64.0
+margin_top = 16.0
+margin_right = 64.0
+margin_bottom = 36.0
+hint_tooltip = "shortcut: (H)
+press once to hide UI, press again to hide keyboard, and press again to show everything"
+mouse_filter = 1
+shortcut_in_tooltip = false
+action_mode = 0
+shortcut = SubResource( 19 )
+text = "hide keyboard"
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="Control" type="Control" parent="."]
 margin_right = 1024.0
@@ -132,7 +171,8 @@ margin_left = -40.0
 margin_top = 136.0
 margin_right = 40.0
 margin_bottom = 156.0
-hint_tooltip = "shortcut: (R)"
+hint_tooltip = "shortcut: (R)
+jump to start of track"
 disabled = true
 shortcut_in_tooltip = false
 action_mode = 0
@@ -143,16 +183,19 @@ __meta__ = {
 }
 
 [node name="loop" type="Button" parent="Control"]
-margin_left = 56.0
-margin_top = 48.0
-margin_right = 184.0
-margin_bottom = 68.0
-hint_tooltip = "shortcut: (L)"
+anchor_left = 0.5
+anchor_right = 0.5
+margin_left = -120.0
+margin_top = 136.0
+margin_right = -56.0
+margin_bottom = 156.0
+hint_tooltip = "shortcut: (L)
+make track loop after it ends"
 toggle_mode = true
 shortcut_in_tooltip = false
 action_mode = 0
 shortcut = SubResource( 7 )
-text = "looping off"
+text = "loop"
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -241,12 +284,10 @@ __meta__ = {
 }
 
 [node name="Color1" type="ColorPickerButton" parent="Control"]
-anchor_left = 1.0
-anchor_right = 1.0
-margin_left = -400.0
-margin_top = 16.0
-margin_right = -344.0
-margin_bottom = 36.0
+margin_left = 56.0
+margin_top = 48.0
+margin_right = 112.0
+margin_bottom = 68.0
 hint_tooltip = "change colour of lower frequencies
 press (C) to change colour mode"
 color = Color( 1, 0, 1, 1 )
@@ -255,11 +296,9 @@ __meta__ = {
 }
 
 [node name="Color2" type="ColorPickerButton" parent="Control"]
-anchor_left = 1.0
-anchor_right = 1.0
-margin_left = -400.0
+margin_left = 128.0
 margin_top = 48.0
-margin_right = -344.0
+margin_right = 184.0
 margin_bottom = 68.0
 hint_tooltip = "change colour of higher frequencies
 press (C) to change colour mode"
@@ -274,7 +313,7 @@ margin_top = 16.0
 margin_right = 184.0
 margin_bottom = 36.0
 hint_tooltip = "shortcut: (O)
-only .mp3 and .ogg are supported"
+only .mp3 and .ogg files are supported"
 shortcut_in_tooltip = false
 action_mode = 0
 shortcut = SubResource( 17 )
@@ -284,16 +323,17 @@ __meta__ = {
 }
 
 [node name="hide" type="Button" parent="Control"]
-margin_left = 200.0
-margin_top = 48.0
-margin_right = 328.0
-margin_bottom = 68.0
-hint_tooltip = "shortcut: (H)
-press once to hide UI, press again to hide keyboard, and press again to show everything"
+anchor_left = 0.5
+anchor_right = 0.5
+margin_left = -64.0
+margin_top = 16.0
+margin_right = 64.0
+margin_bottom = 36.0
+hint_tooltip = "shortcut: (H)"
 shortcut_in_tooltip = false
 action_mode = 0
 shortcut = SubResource( 19 )
-text = "hide (H)"
+text = "hide UI"
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -306,13 +346,13 @@ margin_top = 16.0
 margin_right = -200.0
 margin_bottom = 36.0
 hint_tooltip = "shortcut: (S)
-smooths values over several frames, so that it appears less jumpy"
+smooth values over several frames, so that they appear less jumpy"
 toggle_mode = true
 shortcut_in_tooltip = false
 pressed = true
 action_mode = 0
 shortcut = SubResource( 21 )
-text = "smoothing on"
+text = "smoothing"
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -330,22 +370,24 @@ toggle_mode = true
 shortcut_in_tooltip = false
 action_mode = 0
 shortcut = SubResource( 23 )
-text = "filtering off"
+text = "filtering"
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="full_screen" type="Button" parent="Control"]
-margin_left = 200.0
-margin_top = 16.0
-margin_right = 328.0
-margin_bottom = 36.0
+anchor_left = 0.5
+anchor_right = 0.5
+margin_left = -64.0
+margin_top = 48.0
+margin_right = 64.0
+margin_bottom = 68.0
 hint_tooltip = "shortcut: (F11)"
 toggle_mode = true
 shortcut_in_tooltip = false
 action_mode = 0
 shortcut = SubResource( 25 )
-text = "full screen off"
+text = "full screen"
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -372,6 +414,34 @@ margin_right = -56.0
 margin_bottom = 118.0
 text = "0:00"
 align = 2
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="min_dB_label" type="Label" parent="Control"]
+anchor_left = 1.0
+anchor_right = 1.0
+margin_left = -320.0
+margin_top = 48.0
+margin_right = -274.0
+margin_bottom = 62.0
+hint_tooltip = "adjust the minimum dB that is shown"
+mouse_filter = 0
+text = "clamp"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="tilt_label" type="Label" parent="Control"]
+anchor_left = 1.0
+anchor_right = 1.0
+margin_left = -176.0
+margin_top = 48.0
+margin_right = -130.0
+margin_bottom = 62.0
+hint_tooltip = "adjust the balance of high and low frequencies"
+mouse_filter = 0
+text = "tilt"
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -405,30 +475,6 @@ min_value = -40.0
 max_value = 40.0
 step = 0.1
 suffix = "dB"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="min_dB_label" type="Label" parent="Control"]
-anchor_left = 1.0
-anchor_right = 1.0
-margin_left = -320.0
-margin_top = 48.0
-margin_right = -274.0
-margin_bottom = 62.0
-text = "clamp"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="tilt_label" type="Label" parent="Control"]
-anchor_left = 1.0
-anchor_right = 1.0
-margin_left = -176.0
-margin_top = 48.0
-margin_right = -130.0
-margin_bottom = 62.0
-text = "tilt"
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -475,6 +521,25 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
+[node name="OptionButton" type="OptionButton" parent="Control"]
+anchor_left = 0.5
+anchor_right = 0.5
+margin_left = 56.0
+margin_top = 136.0
+margin_right = 120.0
+margin_bottom = 156.0
+hint_tooltip = "change playback speed
+(will lower sound quality on values other than 1.0x)"
+text = "1.0x"
+items = [ "2.0x", null, false, 0, null, "1.5x", null, false, 1, null, "1.0x", null, false, 3, null, "0.8x", null, false, 4, null, "0.5x", null, false, 5, null ]
+selected = 2
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[connection signal="mouse_entered" from="ControlHide/HideRegion" to="." method="_on_HideRegion_mouse_entered"]
+[connection signal="mouse_exited" from="ControlHide/HideRegion" to="." method="_on_HideRegion_mouse_exited"]
+[connection signal="pressed" from="ControlHide/HideRegion/hide_hidden" to="." method="_on_hide_pressed"]
 [connection signal="toggled" from="Control/startstop" to="." method="_on_startstop_toggled"]
 [connection signal="pressed" from="Control/reset" to="." method="_on_reset_pressed"]
 [connection signal="toggled" from="Control/loop" to="." method="_on_loop_toggled"]
@@ -498,3 +563,4 @@ __meta__ = {
 [connection signal="toggled" from="Control/mute" to="." method="_on_mute_toggled"]
 [connection signal="pressed" from="Control/color" to="." method="_on_color_pressed"]
 [connection signal="value_changed" from="Control/volume" to="." method="_on_volume_value_changed"]
+[connection signal="item_selected" from="Control/OptionButton" to="." method="_on_OptionButton_item_selected"]
