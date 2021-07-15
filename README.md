@@ -12,7 +12,8 @@ Created on Godot 3.3.2.
 
 
 ### TODO:
-- None
+- Fix bug: Unintentional behaviour occurs when H key is pressed
+- Fix bug: Hint on "hide" button isn't correct
 
 ### DONE:
 - Add keyboard shortcuts
