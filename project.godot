@@ -12,7 +12,9 @@ config_version=4
 
 config/name="Piano Transcription Helper"
 run/main_scene="res://Main.tscn"
-config/icon="res://icon.png"
+config/icon="res://icons/icon.png"
+config/macos_native_icon="res://icons/icon.icns"
+config/windows_native_icon="res://icons/icon.ico"
 
 [audio]
 

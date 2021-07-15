@@ -1,4 +1,6 @@
 # Godot Piano Transcription Helper
+Current version: 1.0
+
 ### Description
 A tool to analyse music files by frequencies of every piano key, and display them in nice colours. Can also just be used as a cool background :)
 
@@ -33,3 +35,4 @@ Created on Godot 3.3.2.
 - Fix bug: looping doesn't perform correctly on long tracks
 - Make hide button reappear when UI is hidden
 - Add track tempo scaling feature
+- Release

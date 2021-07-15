@@ -399,8 +399,8 @@ window_title = "Open a File"
 mode = 0
 access = 2
 filters = PoolStringArray( "*.mp3", "*.ogg" )
-current_dir = "/Godot Engine Projects/Frequency Analyzer"
-current_path = "/Godot Engine Projects/Frequency Analyzer/"
+current_dir = "/"
+current_path = "/"
 __meta__ = {
 "_edit_use_anchors_": false
 }
