@@ -1,6 +1,8 @@
 # Godot Piano Transcription Helper
 Current version: 1.0
 
+Download exported project: https://github.com/kinokomushroom/Godot-Piano-Transcription-Helper/tree/main/Exported
+
 ### Description
 A tool to analyse music files by frequencies of every piano key, and display them in nice colours. Can also just be used as a cool background :)
 
