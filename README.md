@@ -46,3 +46,4 @@ Created on Godot 3.3.2.
 
 ### New Feature Ideas
 - export as MIDI
+- export audio spectrogram
