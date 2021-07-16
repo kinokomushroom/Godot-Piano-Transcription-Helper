@@ -40,3 +40,6 @@ Created on Godot 3.3.2.
 - Make hide button reappear when UI is hidden
 - Add track tempo scaling feature
 - Release
+
+### New Feature Ideas
+- export as MIDI
