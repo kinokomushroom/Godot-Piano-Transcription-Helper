@@ -12,6 +12,7 @@ Created on Godot 3.3.2.
 
 
 ### TODO:
+- Fix bug: Mac OS version isn't working
 - Fix bug: Unintentional behaviour occurs when H key is pressed
 - Fix bug: Hint on "hide" button isn't correct
 
