@@ -14,6 +14,7 @@ Created on Godot 3.3.2.
 ### TODO:
 - ~~Fix bug: Mac OS version may not work~~ It kinda works now but some work is required on the user side
 - Fix bug: Linux version may not work
+- Make keys look more like actual piano keys
 
 ### DONE:
 - Add keyboard shortcuts
@@ -45,5 +46,5 @@ Created on Godot 3.3.2.
 - Release v1.1
 
 ### New Feature Ideas
-- export as MIDI
-- export audio spectrogram
+- Export as MIDI
+- Export audio spectrogram 
