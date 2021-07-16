@@ -61,6 +61,7 @@ var reached_end: bool = false
 
 enum HideState {NONE, UI, BOTH}
 var hide_state = HideState.NONE
+var button_visible: bool = true
 
 var actual_volume: float = 1.0
 
@@ -174,6 +175,12 @@ func change_speed(speed: float):
 		$AudioStreamPlayer.bus = "PitchShifted"
 		$AudioStreamPlayer.pitch_scale = speed
 		AudioServer.get_bus_effect(2, 0).pitch_scale = 1.0 / speed
+
+func change_button_visibility():
+	if button_visible:
+		$ControlHide/HideRegion/hide.modulate.a = 1.0
+	else:
+		$ControlHide/HideRegion/hide.modulate.a = 0.0
 
 func analyze_frequencies():
 	if not $AudioStreamPlayer.playing:
@@ -347,6 +354,8 @@ func _process(_delta):
 	
 	analyze_frequencies()
 	update()
+	
+	change_button_visibility()
 #	print(magnitude_db_array[40])
 #	print(play_position)
 
@@ -433,17 +442,25 @@ func _on_hide_pressed():
 		HideState.NONE:
 			hide_state = HideState.UI
 			$Control.rect_position.x = screen_size.x
-			$ControlHide/HideRegion/hide_hidden.visible = true
-			$ControlHide/HideRegion/hide_hidden.text = "hide keyboard"
+			if $ControlHide/HideRegion/hide.is_hovered():
+				button_visible = true
+			else:
+				button_visible = false
+			$ControlHide/HideRegion/hide.text = "hide keyboard"
 		HideState.UI:
 			hide_state = HideState.BOTH
 			bar_screen_height = 1.0
-			$ControlHide/HideRegion/hide_hidden.text = "unhide all"
+			if $ControlHide/HideRegion/hide.is_hovered():
+				button_visible = true
+			else:
+				button_visible = false
+			$ControlHide/HideRegion/hide.text = "unhide all"
 		HideState.BOTH:
 			hide_state = HideState.NONE
 			$Control.rect_position.x = 0
 			bar_screen_height = 1.0 - piano_bar_height
-			$ControlHide/HideRegion/hide_hidden.visible = false
+			button_visible = true
+			$ControlHide/HideRegion/hide.text = "hide UI"
 
 func _on_full_screen_toggled(button_pressed):
 	if button_pressed:
@@ -481,11 +498,11 @@ func _on_color_pressed():
 
 func _on_HideRegion_mouse_entered():
 	if hide_state != HideState.NONE:
-		$ControlHide/HideRegion/hide_hidden.visible = true
+		button_visible = true
 
 func _on_HideRegion_mouse_exited():
 	if hide_state != HideState.NONE:
-		$ControlHide/HideRegion/hide_hidden.visible = false
+		button_visible = false
 
 func _on_OptionButton_item_selected(index):
 	match index:

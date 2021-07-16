@@ -119,21 +119,19 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="hide_hidden" type="Button" parent="ControlHide/HideRegion"]
-visible = false
+[node name="hide" type="Button" parent="ControlHide/HideRegion"]
 anchor_left = 0.5
 anchor_right = 0.5
 margin_left = -64.0
 margin_top = 16.0
 margin_right = 64.0
 margin_bottom = 36.0
-hint_tooltip = "shortcut: (H)
-press once to hide UI, press again to hide keyboard, and press again to show everything"
+hint_tooltip = "shortcut: (H)"
 mouse_filter = 1
 shortcut_in_tooltip = false
 action_mode = 0
 shortcut = SubResource( 3 )
-text = "hide keyboard"
+text = "hide UI"
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -141,6 +139,7 @@ __meta__ = {
 [node name="Control" type="Control" parent="."]
 margin_right = 1024.0
 margin_bottom = 600.0
+mouse_filter = 2
 __meta__ = {
 "_edit_lock_": true,
 "_edit_use_anchors_": false
@@ -318,22 +317,6 @@ shortcut_in_tooltip = false
 action_mode = 0
 shortcut = SubResource( 19 )
 text = "open file"
-__meta__ = {
-"_edit_use_anchors_": false
-}
-
-[node name="hide" type="Button" parent="Control"]
-anchor_left = 0.5
-anchor_right = 0.5
-margin_left = -64.0
-margin_top = 16.0
-margin_right = 64.0
-margin_bottom = 36.0
-hint_tooltip = "shortcut: (H)"
-shortcut_in_tooltip = false
-action_mode = 0
-shortcut = SubResource( 3 )
-text = "hide UI"
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -539,7 +522,7 @@ __meta__ = {
 
 [connection signal="mouse_entered" from="ControlHide/HideRegion" to="." method="_on_HideRegion_mouse_entered"]
 [connection signal="mouse_exited" from="ControlHide/HideRegion" to="." method="_on_HideRegion_mouse_exited"]
-[connection signal="pressed" from="ControlHide/HideRegion/hide_hidden" to="." method="_on_hide_pressed"]
+[connection signal="pressed" from="ControlHide/HideRegion/hide" to="." method="_on_hide_pressed"]
 [connection signal="toggled" from="Control/startstop" to="." method="_on_startstop_toggled"]
 [connection signal="pressed" from="Control/reset" to="." method="_on_reset_pressed"]
 [connection signal="toggled" from="Control/loop" to="." method="_on_loop_toggled"]
@@ -551,7 +534,6 @@ __meta__ = {
 [connection signal="color_changed" from="Control/Color1" to="." method="_on_Color1_color_changed"]
 [connection signal="color_changed" from="Control/Color2" to="." method="_on_Color2_color_changed"]
 [connection signal="pressed" from="Control/open" to="." method="_on_open_pressed"]
-[connection signal="pressed" from="Control/hide" to="." method="_on_hide_pressed"]
 [connection signal="toggled" from="Control/smooth" to="." method="_on_smooth_toggled"]
 [connection signal="toggled" from="Control/filter" to="." method="_on_filter_toggled"]
 [connection signal="toggled" from="Control/full_screen" to="." method="_on_full_screen_toggled"]

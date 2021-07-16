@@ -14,9 +14,8 @@ Created on Godot 3.3.2.
 ### TODO:
 - ~~Fix bug: Mac OS version may not work~~ It kinda works now but some work is required on the user side
 - Fix bug: Linux version may not work
-- Fix bug: Unintentional behaviour occurs when H key is pressed
-- Fix bug: Hint on "hide" button isn't correct
 - Update logo so that it doesn't look too similar to the Synthesia logo
+- Release v1.1
 
 ### DONE:
 - Add keyboard shortcuts
@@ -41,7 +40,9 @@ Created on Godot 3.3.2.
 - Fix bug: looping doesn't perform correctly on long tracks
 - Make hide button reappear when UI is hidden
 - Add track tempo scaling feature
-- Release
+- Release v1.0
+- Fix bug: Hint on "hide" button isn't correct
+- Fix bug: Unintentional behaviour occurs when H key is pressed
 
 ### New Feature Ideas
 - export as MIDI
