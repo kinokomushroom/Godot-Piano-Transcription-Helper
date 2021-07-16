@@ -12,9 +12,11 @@ Created on Godot 3.3.2.
 
 
 ### TODO:
-- Fix bug: Mac OS version isn't working
+- ~~Fix bug: Mac OS version may not work~~ It kinda works now but some work is required on the user side
+- Fix bug: Linux version may not work
 - Fix bug: Unintentional behaviour occurs when H key is pressed
 - Fix bug: Hint on "hide" button isn't correct
+- Update logo so that it doesn't look too similar to the Synthesia logo
 
 ### DONE:
 - Add keyboard shortcuts

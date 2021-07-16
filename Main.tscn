@@ -5,59 +5,59 @@
 [sub_resource type="Gradient" id=1]
 colors = PoolColorArray( 1, 0, 1, 1, 0, 1, 1, 1 )
 
-[sub_resource type="InputEventAction" id=18]
-action = "hide"
-
-[sub_resource type="ShortCut" id=19]
-shortcut = SubResource( 18 )
-
 [sub_resource type="InputEventAction" id=2]
-action = "startstop"
+action = "hide"
 
 [sub_resource type="ShortCut" id=3]
 shortcut = SubResource( 2 )
 
 [sub_resource type="InputEventAction" id=4]
-action = "reset"
+action = "startstop"
 
 [sub_resource type="ShortCut" id=5]
 shortcut = SubResource( 4 )
 
 [sub_resource type="InputEventAction" id=6]
-action = "loop"
+action = "reset"
 
 [sub_resource type="ShortCut" id=7]
 shortcut = SubResource( 6 )
 
 [sub_resource type="InputEventAction" id=8]
-action = "minus1"
+action = "loop"
 
 [sub_resource type="ShortCut" id=9]
 shortcut = SubResource( 8 )
 
 [sub_resource type="InputEventAction" id=10]
-action = "plus1"
+action = "minus1"
 
 [sub_resource type="ShortCut" id=11]
 shortcut = SubResource( 10 )
 
 [sub_resource type="InputEventAction" id=12]
-action = "minus5"
+action = "plus1"
 
 [sub_resource type="ShortCut" id=13]
 shortcut = SubResource( 12 )
 
 [sub_resource type="InputEventAction" id=14]
-action = "plus5"
+action = "minus5"
 
 [sub_resource type="ShortCut" id=15]
 shortcut = SubResource( 14 )
 
 [sub_resource type="InputEventAction" id=16]
-action = "open"
+action = "plus5"
 
 [sub_resource type="ShortCut" id=17]
 shortcut = SubResource( 16 )
+
+[sub_resource type="InputEventAction" id=18]
+action = "open"
+
+[sub_resource type="ShortCut" id=19]
+shortcut = SubResource( 18 )
 
 [sub_resource type="InputEventAction" id=20]
 action = "smooth"
@@ -132,7 +132,7 @@ press once to hide UI, press again to hide keyboard, and press again to show eve
 mouse_filter = 1
 shortcut_in_tooltip = false
 action_mode = 0
-shortcut = SubResource( 19 )
+shortcut = SubResource( 3 )
 text = "hide keyboard"
 __meta__ = {
 "_edit_use_anchors_": false
@@ -158,7 +158,7 @@ disabled = true
 toggle_mode = true
 shortcut_in_tooltip = false
 action_mode = 0
-shortcut = SubResource( 3 )
+shortcut = SubResource( 5 )
 text = "play"
 __meta__ = {
 "_edit_use_anchors_": false
@@ -176,7 +176,7 @@ jump to start of track"
 disabled = true
 shortcut_in_tooltip = false
 action_mode = 0
-shortcut = SubResource( 5 )
+shortcut = SubResource( 7 )
 text = "reset"
 __meta__ = {
 "_edit_use_anchors_": false
@@ -194,7 +194,7 @@ make track loop after it ends"
 toggle_mode = true
 shortcut_in_tooltip = false
 action_mode = 0
-shortcut = SubResource( 7 )
+shortcut = SubResource( 9 )
 text = "loop"
 __meta__ = {
 "_edit_use_anchors_": false
@@ -212,7 +212,7 @@ hint_tooltip = "shortcut: (Down Arrow)"
 disabled = true
 shortcut_in_tooltip = false
 action_mode = 0
-shortcut = SubResource( 9 )
+shortcut = SubResource( 11 )
 text = "-1 s"
 __meta__ = {
 "_edit_use_anchors_": false
@@ -230,7 +230,7 @@ hint_tooltip = "shortcut: (Up Arrow)"
 disabled = true
 shortcut_in_tooltip = false
 action_mode = 0
-shortcut = SubResource( 11 )
+shortcut = SubResource( 13 )
 text = "+1 s"
 __meta__ = {
 "_edit_use_anchors_": false
@@ -248,7 +248,7 @@ hint_tooltip = "shortcut: (Left Arrow)"
 disabled = true
 shortcut_in_tooltip = false
 action_mode = 0
-shortcut = SubResource( 13 )
+shortcut = SubResource( 15 )
 text = "-5 s"
 __meta__ = {
 "_edit_use_anchors_": false
@@ -266,7 +266,7 @@ hint_tooltip = "shortcut: (Right Arrow)"
 disabled = true
 shortcut_in_tooltip = false
 action_mode = 0
-shortcut = SubResource( 15 )
+shortcut = SubResource( 17 )
 text = "+5 s"
 __meta__ = {
 "_edit_use_anchors_": false
@@ -316,7 +316,7 @@ hint_tooltip = "shortcut: (O)
 only .mp3 and .ogg files are supported"
 shortcut_in_tooltip = false
 action_mode = 0
-shortcut = SubResource( 17 )
+shortcut = SubResource( 19 )
 text = "open file"
 __meta__ = {
 "_edit_use_anchors_": false
@@ -332,7 +332,7 @@ margin_bottom = 36.0
 hint_tooltip = "shortcut: (H)"
 shortcut_in_tooltip = false
 action_mode = 0
-shortcut = SubResource( 19 )
+shortcut = SubResource( 3 )
 text = "hide UI"
 __meta__ = {
 "_edit_use_anchors_": false
