@@ -11,6 +11,10 @@ mp3 and ogg files are supported.
 Created on Godot 3.3.2.
 
 
+### Screenshot
+![screenshot](screenshot.png)
+
+
 ### TODO:
 - ~~Fix bug: Mac OS version may not work~~ It kinda works now but some work is required on the user side
 - Fix bug: Linux version may not work
