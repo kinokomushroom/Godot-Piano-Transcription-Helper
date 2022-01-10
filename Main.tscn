@@ -1,6 +1,7 @@
-[gd_scene load_steps=31 format=2]
+[gd_scene load_steps=35 format=2]
 
 [ext_resource path="res://Main.gd" type="Script" id=1]
+[ext_resource path="res://fonts/Metropolis-Regular.otf" type="DynamicFontData" id=2]
 
 [sub_resource type="Gradient" id=1]
 colors = PoolColorArray( 1, 0, 1, 1, 0, 1, 1, 1 )
@@ -59,11 +60,17 @@ action = "open"
 [sub_resource type="ShortCut" id=19]
 shortcut = SubResource( 18 )
 
-[sub_resource type="InputEventAction" id=20]
+[sub_resource type="InputEventAction" id=32]
 action = "smooth"
 
-[sub_resource type="ShortCut" id=21]
-shortcut = SubResource( 20 )
+[sub_resource type="ShortCut" id=33]
+shortcut = SubResource( 32 )
+
+[sub_resource type="InputEventAction" id=31]
+action = "chord"
+
+[sub_resource type="ShortCut" id=34]
+shortcut = SubResource( 31 )
 
 [sub_resource type="InputEventAction" id=22]
 action = "filter"
@@ -89,6 +96,10 @@ action = "color"
 [sub_resource type="ShortCut" id=29]
 shortcut = SubResource( 28 )
 
+[sub_resource type="DynamicFont" id=30]
+size = 32
+font_data = ExtResource( 2 )
+
 [node name="Main" type="Node2D"]
 script = ExtResource( 1 )
 gradient = SubResource( 1 )
@@ -97,13 +108,16 @@ white_key_color = Color( 0.270588, 0.270588, 0.270588, 1 )
 black_key_color = Color( 0.0901961, 0.0901961, 0.0901961, 1 )
 c_color = Color( 0.372549, 0.372549, 0.372549, 1 )
 middle_c_color = Color( 0.470588, 0.470588, 0.470588, 1 )
+chord_key_default_color = Color( 1, 1, 1, 0.145098 )
+chord_key_activated_color = Color( 1, 1, 1, 1 )
+chord_key_topthree_color = Color( 0.470588, 1, 1, 1 )
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
 bus = "Analyze"
 
 [node name="ControlHide" type="Control" parent="."]
-margin_right = 1024.0
-margin_bottom = 600.0
+margin_right = 1280.0
+margin_bottom = 720.0
 __meta__ = {
 "_edit_lock_": true,
 "_edit_use_anchors_": false
@@ -112,8 +126,8 @@ __meta__ = {
 [node name="HideRegion" type="Control" parent="ControlHide"]
 anchor_left = 0.5
 anchor_right = 0.5
-margin_left = -80.0
-margin_right = 80.0
+margin_left = -152.0
+margin_right = 8.0
 margin_bottom = 56.0
 __meta__ = {
 "_edit_use_anchors_": false
@@ -137,11 +151,25 @@ __meta__ = {
 }
 
 [node name="Control" type="Control" parent="."]
-margin_right = 1024.0
-margin_bottom = 600.0
+margin_right = 1280.0
+margin_bottom = 720.0
 mouse_filter = 2
 __meta__ = {
 "_edit_lock_": true,
+"_edit_use_anchors_": false
+}
+
+[node name="filename" type="Label" parent="Control"]
+anchor_left = 0.5
+anchor_right = 0.5
+margin_left = -624.0
+margin_top = 56.0
+margin_right = 624.0
+margin_bottom = 70.0
+text = "No file chosen"
+align = 1
+valign = 2
+__meta__ = {
 "_edit_use_anchors_": false
 }
 
@@ -334,8 +362,25 @@ toggle_mode = true
 shortcut_in_tooltip = false
 pressed = true
 action_mode = 0
-shortcut = SubResource( 21 )
+shortcut = SubResource( 33 )
 text = "smoothing"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="chord" type="Button" parent="Control"]
+margin_left = 200.0
+margin_top = 16.0
+margin_right = 328.0
+margin_bottom = 36.0
+hint_tooltip = "shortcut: (D)
+show/hide chord analysis"
+toggle_mode = true
+shortcut_in_tooltip = false
+pressed = true
+action_mode = 0
+shortcut = SubResource( 34 )
+text = "chord"
 __meta__ = {
 "_edit_use_anchors_": false
 }
@@ -361,10 +406,10 @@ __meta__ = {
 [node name="full_screen" type="Button" parent="Control"]
 anchor_left = 0.5
 anchor_right = 0.5
-margin_left = -64.0
-margin_top = 48.0
-margin_right = 64.0
-margin_bottom = 68.0
+margin_left = 8.0
+margin_top = 16.0
+margin_right = 136.0
+margin_bottom = 36.0
 hint_tooltip = "shortcut: (F11)"
 toggle_mode = true
 shortcut_in_tooltip = false
@@ -405,9 +450,9 @@ __meta__ = {
 anchor_left = 1.0
 anchor_right = 1.0
 margin_left = -320.0
-margin_top = 48.0
+margin_top = 56.0
 margin_right = -274.0
-margin_bottom = 62.0
+margin_bottom = 70.0
 hint_tooltip = "adjust the minimum dB that is shown"
 mouse_filter = 0
 text = "clamp"
@@ -419,9 +464,9 @@ __meta__ = {
 anchor_left = 1.0
 anchor_right = 1.0
 margin_left = -176.0
-margin_top = 48.0
+margin_top = 56.0
 margin_right = -130.0
-margin_bottom = 62.0
+margin_bottom = 70.0
 hint_tooltip = "adjust the balance of high and low frequencies"
 mouse_filter = 0
 text = "tilt"
@@ -520,6 +565,295 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
+[node name="chord_keys" type="Control" parent="Control"]
+margin_left = 56.0
+margin_top = 169.0
+margin_right = 96.0
+margin_bottom = 209.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="0" type="Control" parent="Control/chord_keys"]
+margin_right = 40.0
+margin_bottom = 40.0
+__meta__ = {
+"_edit_lock_": true,
+"_edit_use_anchors_": false
+}
+
+[node name="ColorRect" type="ColorRect" parent="Control/chord_keys/0"]
+margin_top = 42.0
+margin_right = 20.0
+margin_bottom = 64.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ColorRect2" type="ColorRect" parent="Control/chord_keys/0"]
+margin_top = 1.0
+margin_right = 12.0
+margin_bottom = 42.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="1" type="Control" parent="Control/chord_keys"]
+margin_right = 40.0
+margin_bottom = 40.0
+__meta__ = {
+"_edit_lock_": true,
+"_edit_use_anchors_": false
+}
+
+[node name="ColorRect2" type="ColorRect" parent="Control/chord_keys/1"]
+margin_left = 15.0
+margin_top = 1.0
+margin_right = 27.0
+margin_bottom = 39.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="2" type="Control" parent="Control/chord_keys"]
+margin_right = 40.0
+margin_bottom = 40.0
+__meta__ = {
+"_edit_lock_": true,
+"_edit_use_anchors_": false
+}
+
+[node name="ColorRect" type="ColorRect" parent="Control/chord_keys/2"]
+margin_left = 23.0
+margin_top = 42.0
+margin_right = 43.0
+margin_bottom = 64.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ColorRect2" type="ColorRect" parent="Control/chord_keys/2"]
+margin_left = 30.0
+margin_top = 1.0
+margin_right = 37.0
+margin_bottom = 42.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="3" type="Control" parent="Control/chord_keys"]
+margin_right = 40.0
+margin_bottom = 40.0
+__meta__ = {
+"_edit_lock_": true,
+"_edit_use_anchors_": false
+}
+
+[node name="ColorRect2" type="ColorRect" parent="Control/chord_keys/3"]
+margin_left = 40.0
+margin_top = 1.0
+margin_right = 52.0
+margin_bottom = 39.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="4" type="Control" parent="Control/chord_keys"]
+margin_right = 40.0
+margin_bottom = 40.0
+__meta__ = {
+"_edit_lock_": true,
+"_edit_use_anchors_": false
+}
+
+[node name="ColorRect" type="ColorRect" parent="Control/chord_keys/4"]
+margin_left = 46.0
+margin_top = 42.0
+margin_right = 66.0
+margin_bottom = 64.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ColorRect2" type="ColorRect" parent="Control/chord_keys/4"]
+margin_left = 55.0
+margin_top = 1.0
+margin_right = 66.0
+margin_bottom = 42.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="5" type="Control" parent="Control/chord_keys"]
+margin_right = 40.0
+margin_bottom = 40.0
+__meta__ = {
+"_edit_lock_": true,
+"_edit_use_anchors_": false
+}
+
+[node name="ColorRect" type="ColorRect" parent="Control/chord_keys/5"]
+margin_left = 69.0
+margin_top = 42.0
+margin_right = 89.0
+margin_bottom = 64.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ColorRect2" type="ColorRect" parent="Control/chord_keys/5"]
+margin_left = 69.0
+margin_top = 1.0
+margin_right = 79.0
+margin_bottom = 42.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="6" type="Control" parent="Control/chord_keys"]
+margin_right = 40.0
+margin_bottom = 40.0
+__meta__ = {
+"_edit_lock_": true,
+"_edit_use_anchors_": false
+}
+
+[node name="ColorRect2" type="ColorRect" parent="Control/chord_keys/6"]
+margin_left = 82.0
+margin_top = 1.0
+margin_right = 94.0
+margin_bottom = 39.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="7" type="Control" parent="Control/chord_keys"]
+margin_right = 40.0
+margin_bottom = 40.0
+__meta__ = {
+"_edit_lock_": true,
+"_edit_use_anchors_": false
+}
+
+[node name="ColorRect" type="ColorRect" parent="Control/chord_keys/7"]
+margin_left = 92.0
+margin_top = 42.0
+margin_right = 112.0
+margin_bottom = 64.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ColorRect2" type="ColorRect" parent="Control/chord_keys/7"]
+margin_left = 97.0
+margin_top = 1.0
+margin_right = 104.0
+margin_bottom = 42.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="8" type="Control" parent="Control/chord_keys"]
+margin_right = 40.0
+margin_bottom = 40.0
+__meta__ = {
+"_edit_lock_": true,
+"_edit_use_anchors_": false
+}
+
+[node name="ColorRect2" type="ColorRect" parent="Control/chord_keys/8"]
+margin_left = 107.0
+margin_top = 1.0
+margin_right = 119.0
+margin_bottom = 39.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="9" type="Control" parent="Control/chord_keys"]
+margin_right = 40.0
+margin_bottom = 40.0
+__meta__ = {
+"_edit_lock_": true,
+"_edit_use_anchors_": false
+}
+
+[node name="ColorRect" type="ColorRect" parent="Control/chord_keys/9"]
+margin_left = 115.0
+margin_top = 42.0
+margin_right = 135.0
+margin_bottom = 64.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ColorRect2" type="ColorRect" parent="Control/chord_keys/9"]
+margin_left = 122.0
+margin_top = 1.0
+margin_right = 129.0
+margin_bottom = 42.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="10" type="Control" parent="Control/chord_keys"]
+margin_right = 40.0
+margin_bottom = 40.0
+__meta__ = {
+"_edit_lock_": true,
+"_edit_use_anchors_": false
+}
+
+[node name="ColorRect2" type="ColorRect" parent="Control/chord_keys/10"]
+margin_left = 132.0
+margin_top = 1.0
+margin_right = 144.0
+margin_bottom = 39.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="11" type="Control" parent="Control/chord_keys"]
+margin_right = 40.0
+margin_bottom = 40.0
+__meta__ = {
+"_edit_lock_": true,
+"_edit_use_anchors_": false
+}
+
+[node name="ColorRect" type="ColorRect" parent="Control/chord_keys/11"]
+margin_left = 138.0
+margin_top = 42.0
+margin_right = 158.0
+margin_bottom = 64.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ColorRect2" type="ColorRect" parent="Control/chord_keys/11"]
+margin_left = 147.0
+margin_top = 1.0
+margin_right = 158.0
+margin_bottom = 42.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="chord_name" type="Label" parent="Control"]
+modulate = Color( 1, 1, 1, 0.768627 )
+margin_left = 231.0
+margin_top = 186.0
+margin_right = 345.0
+margin_bottom = 233.0
+custom_fonts/font = SubResource( 30 )
+text = "C#sus2"
+valign = 2
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="chord_tween" type="Tween" parent="Control"]
+
 [connection signal="mouse_entered" from="ControlHide/HideRegion" to="." method="_on_HideRegion_mouse_entered"]
 [connection signal="mouse_exited" from="ControlHide/HideRegion" to="." method="_on_HideRegion_mouse_exited"]
 [connection signal="pressed" from="ControlHide/HideRegion/hide" to="." method="_on_hide_pressed"]
@@ -535,6 +869,7 @@ __meta__ = {
 [connection signal="color_changed" from="Control/Color2" to="." method="_on_Color2_color_changed"]
 [connection signal="pressed" from="Control/open" to="." method="_on_open_pressed"]
 [connection signal="toggled" from="Control/smooth" to="." method="_on_smooth_toggled"]
+[connection signal="toggled" from="Control/chord" to="." method="_on_chord_toggled"]
 [connection signal="toggled" from="Control/filter" to="." method="_on_filter_toggled"]
 [connection signal="toggled" from="Control/full_screen" to="." method="_on_full_screen_toggled"]
 [connection signal="file_selected" from="Control/FileDialog" to="." method="_on_FileDialog_file_selected"]
