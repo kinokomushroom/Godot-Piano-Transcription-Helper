@@ -1,24 +1,32 @@
 # Godot Piano Transcription Helper
-Current version: 1.0
-
-Download for Windows, Mac OS, and Linux: https://github.com/kinokomushroom/Godot-Piano-Transcription-Helper/releases/tag/v1.0
+Current version: 1.2
 
 ### Description
-A tool to analyse music files by frequencies of every piano key, and display them in nice colours. Can also just be used as a cool background :)
+A tool to analyse music files by frequencies of every piano key, and analyse chords. Can also just be used as a cool background :)
 
 mp3 and ogg files are supported.
 
-Created on Godot 3.3.2.
+Created on Godot 3.4
 
 
 ### Screenshot
 ![screenshot](screenshot.png)
 
 
-### TODO:
+### Version 1.2 Changes & Features:
+- Chord analysis
+- Currently opened file path is now displayed
+
+### Version 1.1 Changes & Features:
+- Updated icon
+- Fixed bugs
+
+### TODO and Ideas:
 - ~~Fix bug: Mac OS version may not work~~ It kinda works now but some work is required on the user side
 - Fix bug: Linux version may not work
 - Make keys look more like actual piano keys
+- Export as MIDI
+- Export audio spectrogram
 
 ### DONE:
 - Add keyboard shortcuts
@@ -48,7 +56,5 @@ Created on Godot 3.3.2.
 - Fix bug: Unintentional behaviour occurs when H key is pressed
 - Update logo so that it doesn't look too similar to the Synthesia logo
 - Release v1.1
-
-### New Feature Ideas
-- Export as MIDI
-- Export audio spectrogram 
+- Add chord analysis feature
+- Add current file path display

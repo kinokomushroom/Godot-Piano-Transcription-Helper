@@ -46,6 +46,24 @@ var c_length: float = 0.05
 export var c_color: Color
 export var middle_c_color: Color
 
+# chord analysis stuff
+var chord_key_array = [] # stores the frequency of pressed keys grouped by pitch
+export var chord_key_default_color: Color
+export var chord_key_activated_color: Color
+export var chord_key_topthree_color: Color
+var key_names = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
+var invalid_chord: String = "---"
+var chord: String = invalid_chord
+var last_chord: String = invalid_chord
+const FIRST: int = 0
+const MIDDLE: int = 1
+const LAST: int = 2
+var chord_chart = {2: {7: ["sus2", FIRST, "sus4", LAST]},
+3: {8: ["maj", LAST], 7: ["min", FIRST], 6: ["dim", FIRST], 9: ["dim", LAST]},
+4: {7: ["maj", FIRST], 9: ["min", LAST], 8: ["aug", FIRST, "aug", LAST, "aug", MIDDLE]},
+5: {9: ["maj", MIDDLE], 8: ["min", MIDDLE], 10: ["sus2", LAST, "sus4", MIDDLE], 7: ["sus2", MIDDLE, "sus4", FIRST]},
+6: {9: ["dim", MIDDLE]}}
+
 var delta: float = 1.0 / 60.0
 var spectrum: AudioEffectSpectrumAnalyzerInstance = AudioServer.get_bus_effect_instance(1, 0)
 var stream_length: float = 0.0
@@ -67,8 +85,11 @@ var actual_volume: float = 1.0
 
 func map_range(value, source_start, source_end, target_start, target_end):
 	var mapped_value: float = value - source_start
-	mapped_value *= (target_end - target_start) / (source_end - source_start)
-	mapped_value += target_start
+	if source_start != source_end:
+		mapped_value *= (target_end - target_start) / (source_end - source_start)
+		mapped_value += target_start
+	else: # source range is zero
+		mapped_value = target_start
 	return mapped_value
 
 func linear_interpolate(factor: float, value_1, value_2):
@@ -232,6 +253,43 @@ func analyze_frequencies():
 		else:
 			filtered_magnitude_array[key_index] = max(0.0, filtered_magnitude_array[key_index] - 1.0 / filter_disappear_speed * delta)
 
+func analyze_chord():
+	# summerize notes over octaves
+	var threshold_magnitude: float = lowest_magnitude - absolute_lowest_magnitude
+	for chord_key_index in 12: # add up the magnitude of same notes through different octaves
+		chord_key_array[chord_key_index] = 0
+		for original_key_index in 7: # number of full octaves
+			var current_key_index: int = 3 + chord_key_index + (original_key_index * 12) # only use keys in octave 1 to 7 (discarding 0 and 8)
+			var current_magnitude: float = (magnitude_db_array[current_key_index][averaging_frames - 1] - absolute_lowest_magnitude) * filtered_magnitude_array[current_key_index]
+			chord_key_array[chord_key_index] += max(current_magnitude - threshold_magnitude, 0)
+	var max_magnitude: float = chord_key_array.max()
+	for chord_key_index in 12: # convert range to 0-1
+		var new_value: float = chord_key_array[chord_key_index]
+		new_value = map_range(new_value, 0, max_magnitude, 0, 1)
+		chord_key_array[chord_key_index] = new_value
+	
+	# get triad and figure out chord
+	var sorted_chord_key_array = chord_key_array.duplicate()
+	sorted_chord_key_array.sort() # sort from lowest to highest
+	var triad_values = [sorted_chord_key_array[11], sorted_chord_key_array[10], sorted_chord_key_array[9]]
+	if triad_values.min() == 0: # invalid triad
+		chord = invalid_chord
+	else:
+		var triad_keys = [chord_key_array.find(triad_values[0]), chord_key_array.find(triad_values[1]), chord_key_array.find(triad_values[2])]
+		triad_keys.sort() # sort by key index
+		
+		var chord_info = chord_chart.get(triad_keys[1] - triad_keys[0], {}).get(triad_keys[2] - triad_keys[0], [])
+		chord = ""
+		if chord_info.size() != 0:
+			for chord_index in chord_info.size() / 2:
+				var chord_name: String = chord_info[chord_index * 2]
+				var chord_start_key: int = chord_info[chord_index * 2 + 1]
+				if chord_index > 0:
+					chord += " / "
+				chord += key_names[triad_keys[chord_start_key]] + chord_name
+		else:
+			chord = invalid_chord
+
 func draw_magnitude():
 	for key_index in range(0, key_number):
 		var magnitude: float = magnitude_db_array[key_index][averaging_frames - 1]
@@ -303,11 +361,29 @@ func draw_c():
 #			draw_circle(Vector2(x_position, y_position), radius, center_circle_color)
 			draw_rect(Rect2(x_position - width / 2, screen_size.y - height, width, height), middle_c_color)
 
+func draw_chord_keys():
+	var sorted_chord_key_array = chord_key_array.duplicate()
+	sorted_chord_key_array.sort() # sort from lowest to highest
+	var third_highest: float = sorted_chord_key_array[9] # third highest value 
+	var chord_keys = $Control/chord_keys
+	for key_index in 12:
+		var current_value: float = chord_key_array[key_index]
+		if current_value >= third_highest:
+			chord_keys.get_node(str(key_index)).modulate = chord_key_default_color.linear_interpolate(chord_key_topthree_color, current_value)
+		else:
+			chord_keys.get_node(str(key_index)).modulate = chord_key_default_color.linear_interpolate(chord_key_activated_color, current_value)
+	$Control/chord_name.text = chord
+	if chord != last_chord: # fade in text if chord has changed
+		$Control/chord_tween.interpolate_property($Control/chord_name, "self_modulate", Color(1, 1, 1, 0), Color(1, 1, 1, 1), 0.2, Tween.TRANS_CIRC, Tween.EASE_IN_OUT)
+		$Control/chord_tween.start()
+	last_chord = chord
+
 func _draw():
 	update_colors()
 	draw_rect(Rect2(0, 0, screen_size.x, screen_size.y), Color.black)
 	draw_lines()
 	draw_magnitude()
+	draw_chord_keys()
 	if hide_state != HideState.BOTH:
 		draw_key()
 		draw_c()
@@ -340,6 +416,9 @@ func _ready():
 		
 		var x_position_uniform: float = 1.0 / key_number * (key_index + 0.5)
 		color_array.append(gradient.interpolate(x_position_uniform))
+	
+	for key_index in 12:
+		chord_key_array.append(0)
 
 func _process(_delta):
 	delta = _delta
@@ -353,6 +432,7 @@ func _process(_delta):
 	$Control/Timestamp.text = "%d:%02d" % [minutes, seconds]
 	
 	analyze_frequencies()
+	analyze_chord()
 	update()
 	
 	change_button_visibility()
@@ -392,6 +472,7 @@ func _on_FileDialog_file_selected(path):
 	elif String(path).ends_with(".mp3"):
 		$AudioStreamPlayer.stream = import_mp3(path)
 	file_chosen = true
+	$Control/filename.text = path
 	initialize_values()
 
 func _on_Color1_color_changed(color):
@@ -419,6 +500,14 @@ func _on_filter_toggled(button_pressed):
 		filter = true
 	else:
 		filter = false
+
+func _on_chord_toggled(button_pressed):
+	if button_pressed:
+		$Control/chord_keys.visible = true
+		$Control/chord_name.visible = true
+	else:
+		$Control/chord_keys.visible = false
+		$Control/chord_name.visible = false
 
 func _on_tilt_value_changed(value):
 	tilt_amount = value
@@ -475,7 +564,6 @@ func _on_volume_value_changed(value):
 	AudioServer.set_bus_volume_db(0, volume_db)
 	if value != -1.0: # record value when not muted
 		actual_volume = value
-
 
 func _on_mute_toggled(button_pressed):
 	if button_pressed:
